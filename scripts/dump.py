@@ -50,6 +50,7 @@ def integrate():
         }
         for service in
         json.load(open(get_filename('Service')))
+        if service['fields'].get('Name')
     ]
     owners = [
         {
@@ -61,6 +62,7 @@ def integrate():
         }
         for owner in
         json.load(open(get_filename('Person')))
+        if owner['fields'].get('Name')
     ]
     organisations = [
         {
@@ -74,6 +76,7 @@ def integrate():
         }
         for organisation in
         json.load(open(get_filename('Organisation')))
+        if organisation['fields'].get('Name')
     ]
     categories = [
         {
@@ -88,6 +91,7 @@ def integrate():
         }
         for category in
         json.load(open(get_filename('Category')))
+        if category['fields'].get('Name')
     ]
     data = {
         'services': services,
