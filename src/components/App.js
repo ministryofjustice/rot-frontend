@@ -13,8 +13,9 @@ import * as CategoryContainers from '../containers/CategoryContainers';
 import { NavBar } from './Nav';
 import ModelRoutes from './ModelRoutes';
 
-import '../App.css';
-import '../govuk-elements-styles.css';
+import 'react-select/dist/react-select.css';
+import '../styles/App.css';
+import '../styles/govuk-elements-styles.css';
 
 
 const App = () => {
@@ -34,15 +35,15 @@ const App = () => {
   };
   const personComponents = {
     List: PersonContainers.ListContainer,
-    Detail: Person.Detail,
-    Create: Person.Create,
+    Detail: PersonContainers.DetailContainer,
+    Create: PersonContainers.CreateContainer,
     Update: Person.Update,
     Delete: Person.Delete
   };
   const categoryComponents = {
     List: CategoryContainers.ListContainer,
-    Detail: Category.Detail,
-    Create: Category.Create,
+    Detail: CategoryContainers.DetailContainer,
+    Create: CategoryContainers.CreateContainer,
     Update: Category.Update,
     Delete: Category.Delete
   };

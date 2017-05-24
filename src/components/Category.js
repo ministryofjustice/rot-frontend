@@ -6,6 +6,7 @@ import Griddle, {
 } from 'griddle-react';
 
 import { enhancedWithRowData }from './Base';
+import { Input, TextArea, Select, Button } from './elements/form-elements';
 
 
 const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
@@ -27,19 +28,86 @@ const ParentLink = ({ value }) => {
 };
 
 
-export const Detail = ({ match }) => (
-  <div>
-    <h2 className="heading-large">Detail View for Category id={ match.params.id }</h2>
-  </div>
-);
+export const Detail = ({ id, name, description, parent }) => {
+  if (typeof id === 'undefined') {
+    return null;
+  }
+
+  const Parent = parent ? (
+    <a href={ `/categories/${parent.id}` }>{ parent.name }</a>
+  ) : (
+    <span></span>
+  );
+
+  return (
+    <div>
+      <h2 className="heading-large">Detail View for Category</h2>
+      <ul>
+        <li>{ `name : ${name}` }</li>
+        <li>{ `description : ${description || ''}` }</li>
+        <li>parent: { Parent }</li>
+      </ul>
+    </div>
+  );
+};
 
 
-export const Create = ({ match }) => (
-  <div>
-    <h2 className="heading-large">Create New Category</h2>
-  </div>
-);
+export class Create extends React.Component {
 
+  get isFormValid() {
+    const { newCategory } = this.props;
+    if (newCategory.name === '') {
+      return false;
+    }
+    const values = Object.values(newCategory.errors)
+      .filter(val => val !== '');
+    return values.length === 0;
+  }
+
+  render() {
+    const {
+      newCategory,
+      categories,
+      handleNameChange,
+      handleDescriptionChange,
+      handleParentChange,
+      handleCreate
+    } = this.props;
+    return (
+      <div>
+        <h2 className="heading-large">Create New Category</h2>
+        <Input
+          name="name"
+          label="Name"
+          value={ newCategory.name }
+          error={ newCategory.errors.name }
+          onChange={ e => handleNameChange(e.target.value) }
+        />
+        <TextArea
+          name="description"
+          label="Description"
+          value={ newCategory.description }
+          error={ newCategory.errors.description }
+          onChange={ (e) => handleDescriptionChange(e.target.value) }
+        />
+        <Select
+          name="parent"
+          value={ newCategory.parentId }
+          label="Parent"
+          error={ newCategory.errors.parentId }
+          options={ categories.map(category => ({ value: category.id, label: category.name })) }
+          onChange={ item => handleParentChange(item ? item.value : null) }
+        />
+        <Button
+          type="submit"
+          value="Create"
+          disabled={ !this.isFormValid }
+          onClick={ handleCreate }
+        />
+      </div>
+    );
+  }
+}
 
 export const Update = ({ match }) => (
   <div>
@@ -55,8 +123,7 @@ export const Delete = ({ match }) => (
 );
 
 
-export const List = ({ categories }) => {
-  return (
+export const List = ({ categories }) => (
   <div>
     <h2 className="heading-large">List View for Categories</h2>
     <a className="" href="/categories/new">+ Create New</a>
@@ -80,4 +147,4 @@ export const List = ({ categories }) => {
       </RowDefinition>
     </Griddle>
   </div>
-)}
+);

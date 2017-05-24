@@ -3,13 +3,13 @@ import { routerReducer } from 'react-router-redux';
 
 import area from './area';
 import service from './service';
-import persons from './person';
+import person from './person';
 import category from './category';
 
 
 const reducer = combineReducers({
   service,
-  persons,
+  person,
   area,
   category,
   routing: routerReducer

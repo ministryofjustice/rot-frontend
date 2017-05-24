@@ -4,8 +4,9 @@ import Griddle, {
   ColumnDefinition,
   plugins
 } from 'griddle-react';
-import { enhancedWithRowData }from './Base';
-import CreateButton from './CreateButton';
+
+import { enhancedWithRowData } from './Base';
+import { Input, TextArea, Select, Button } from './elements/form-elements';
 
 
 const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
@@ -26,7 +27,7 @@ const OwnerLink = ({ value }) => {
   return <a href={ `/persons/${value.get( 'id' ) }` }>{ value.get( 'name' ) }</a>
 };
 
-const Areas = ({ value }) => {
+const AreaLinks = ({ value }) => {
   return (
     <span>
     {
@@ -76,7 +77,7 @@ export const List = ( { services } ) => (
         <ColumnDefinition
           id="areas"
           title="Business Areas"
-          customComponent={ Areas }
+          customComponent={ AreaLinks }
         />
         <ColumnDefinition
           id="category"
@@ -135,151 +136,81 @@ export const Detail = ({ id, name, description, owner, areas, category }) => {
 };
 
 
-const Name = ({ value, error, onChange }) => {
-  const divClassName = ! error ? "form-group" : "form-group form-group-error";
-  const inputClassName = ! error ? "form-control" : "form-control form-control-error";
-  return (
-    <div className={ divClassName }>
-      <label className="form-label-bold" htmlFor="name">Name</label>
-      {
-        ! error ? null : (
-            <span className="error-message">{ error }</span>
-        )
-      }
-      <input
-        id="name"
-        className={ inputClassName }
-        type="text"
-        name="name"
-        value={ value }
-        onChange={ onChange }
-      />
-    </div>
-  );
-};
-
-
-const Description = ({ value, error, onChange }) => {
-  const divClassName = ! error ? "form-group" : "form-group form-group-error";
-  const textAreaClassName = ! error ? "form-control" : "form-control form-control-error";
-  return (
-    <div className={ divClassName }>
-      <label className="form-label-bold" htmlFor="description">Description</label>
-      {
-        ! error ? null : (
-            <span className="error-message">{ error }</span>
-        )
-      }
-      <textarea
-        id="description"
-        className={ textAreaClassName }
-        type="text"
-        name="description"
-        value={ value }
-        onChange={ onChange }
-      />
-    </div>
-  );
-};
-
-
-const Owner = ({ ownerId, persons, onChange }) => {
-  return (
-    <div className="form-group">
-      <label className="form-label-bold" htmlFor="parent">Owner</label>
-      <select
-        id="owner"
-        className="form-control"
-        type="text"
-        name="parent"
-        value={ ownerId }
-        onChange={ onChange }
-      >
-        <option value={ null }></option>
-        {
-          persons.map(
-            person => (
-              <option key={ person.id } value={ person.id }>
-                { person.name }
-              </option> )
-          )
-        }
-      </select>
-    </div>
-  );
-};
-
-
-const Category = ({ categoryId, categories, onChange }) => {
-  return (
-    <div className="form-group">
-      <label className="form-label-bold" htmlFor="parent">Category</label>
-      <select
-        id="category"
-        className="form-control"
-        type="text"
-        name="parent"
-        value={ categoryId }
-        onChange={ onChange }
-      >
-        <option value={ null }></option>
-        {
-          categories.map(
-            category => (
-              <option key={ category.id } value={ category.id }>
-                { category.name }
-              </option> )
-          )
-        }
-      </select>
-    </div>
-  );
-}
-
-
 export class Create extends React.Component {
 
   get isFormValid() {
-    return true;
+    const { newService } = this.props;
+    if (newService.name === '') {
+      return false;
+    }
+    if (newService.ownerId === '') {
+      return false;
+    }
+    if (newService.areaIds.length === 0) {
+      return false;
+    }
+    const values = Object.values(newService.errors)
+      .filter(val => val !== '');
+    return values.length === 0;
   }
 
   render() {
     const {
       newService,
-      services,
       persons,
       categories,
+      areas,
       handleNameChange,
       handleDescriptionChange,
       handleOwnerChange,
-      handleAreaChange,
+      handleAreasChange,
       handleCategoryChange,
       handleCreate
     } = this.props;
     return (
       <div>
         <h2 className="heading-large">Create New Service</h2>
-        <Name 
+        <Input
+          name="name"
+          label="Name"
           value={ newService.name }
           error={ newService.errors.name }
           onChange={ e => handleNameChange(e.target.value) }
         />
-        <Description
+        <TextArea
+          name="description"
+          label="Description"
           value={ newService.description }
           error={ newService.errors.description }
           onChange={ (e) => handleDescriptionChange(e.target.value) }
         />
-        <Owner
-          persons={ persons }
+        <Select
+          name="owner"
+          value={ newService.ownerId }
+          label="Owner"
           error={ newService.errors.ownerId }
-          onChange={ e => handleOwnerChange(e.target.value) }
+          options={ persons.map(person => ({ value: person.id, label: person.name })) }
+          onChange={ item => handleOwnerChange(item ? item.value : null) }
         />
-        <Category
-          categories={ categories }
+        <Select
+          name="category"
+          value={ newService.categoryId }
+          label="Catogory"
+          options={ categories.map(category => ({ value: category.id, label: category.name })) }
           error={ newService.errors.categoryId }
-          onChange={ e => handleCategoryChange(e.target.value) }
+          onChange={ item => handleCategoryChange(item ? item.value: null) }
         />
-        <CreateButton
+        <Select
+          name="areas"
+          value={ newService.areaIds }
+          label="Areas"
+          isMulti={ true }
+          options={ areas.map(area => ( { value: area.id, label: area.name } )) }
+          onChange={ items => handleAreasChange(items.map(({ value }) => value)) }
+        />
+        <Button
+          type="submit"
+          value="Create"
           disabled={ !this.isFormValid }
           onClick={ handleCreate }
         />

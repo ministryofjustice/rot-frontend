@@ -6,12 +6,13 @@ import { Create, List, Detail } from '../components/Service';
 export const CreateContainer = connect(
   state => ({
     services: state.service.all,
-    persons: state.persons,
+    persons: state.person.all,
     categories: state.category.all,
+    areas: state.area.all,
     newService: state.service.newInstance
   }),
   dispatch => ({
-    handleCreate: (area) => dispatch({
+    handleCreate: () => dispatch({
       type: 'NEW_SERVICE_CREATE_STARTED'
     }),
     handleNameChange: (name) => dispatch({
@@ -26,16 +27,13 @@ export const CreateContainer = connect(
       type: 'NEW_SERVICE_OWNER_CHANGED',
       ownerId
     }),
-    handleAreaChange: (areaId) => dispatch({
-      type: 'NEW_SERVICE_AREA_CHANGED',
-      areaId
+    handleAreasChange: (areaIds) => dispatch({
+      type: 'NEW_SERVICE_AREAS_CHANGED',
+      areaIds
     }),
     handleCategoryChange: (categoryId) => dispatch({
       type: 'NEW_SERVICE_CATEGORY_CHANGED',
       categoryId
-    }),
-    handleCreate: () => dispatch({
-      type: 'NEW_SERVICE_CREATE_STARTED'
     })
   })
 )(Create);

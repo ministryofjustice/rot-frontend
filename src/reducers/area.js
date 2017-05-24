@@ -6,7 +6,7 @@ const cleanState = {
     parentId: '',
     errors: {}
   }
-}
+};
 
 
 const processData = (state, action) => {
@@ -18,7 +18,7 @@ const processData = (state, action) => {
     return Object.assign({}, area, { parent });
   });
   return Object.assign({}, state, { all });
-}
+};
 
 
 const handleNameChange = (state, action) => {
@@ -31,35 +31,35 @@ const handleNameChange = (state, action) => {
   const errMsg = typeof existing === 'undefined' ? '' : 'name already exists';
   const errors = Object.assign({}, state.newInstance.errors, { name: errMsg })
   return Object.assign({}, state, { newInstance: Object.assign({}, state.newInstance, { name, errors })});
-}
+};
 
 
-const handleDiscriptionChange = (state, action) => {
+const handleDescriptionChange = (state, action) => {
   const description = action.description;
   return Object.assign({}, state, { newInstance: Object.assign({}, state.newInstance, { description }) });
-}
+};
 
 
 const handleParentIdChange = (state, action) => {
   const parentId = action.parentId;
   return Object.assign({}, state, { newInstance: Object.assign({}, state.newInstance, { parentId }) });
-}
+};
 
 
 const handleCreateSucceed = (state, action) => {
   const newInstance = cleanState.newInstance;
   return Object.assign({}, state, { newInstance });
-}
+};
 
 
-const area = (state=cleanState,  action) => {
+const area = (state = cleanState,  action) => {
   switch(action.type) {
     case 'FETCH_DATA_SUCCEEDED':
       return processData(state, action);
     case 'NEW_AREA_NAME_CHANGED':
       return handleNameChange(state, action);
     case 'NEW_AREA_DESCRIPTION_CHANGED':
-      return handleDiscriptionChange(state, action);
+      return handleDescriptionChange(state, action);
     case 'NEW_AREA_PARENT_CHANGED':
       return handleParentIdChange(state, action);
     case 'NEW_AREA_CREATE_SUCCEEDED':
@@ -67,7 +67,7 @@ const area = (state=cleanState,  action) => {
     default:
       return state;
   }
-}
+};
 
 
 export default area;

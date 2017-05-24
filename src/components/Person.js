@@ -5,6 +5,7 @@ import Griddle, {
   plugins
 } from 'griddle-react';
 import { enhancedWithRowData }from './Base';
+import { Input, Button } from './elements/form-elements';
 
 
 const LinkToView = ({ rowData, value }) => (
@@ -56,21 +57,79 @@ export const List = ({ persons }) => (
       </RowDefinition>
     </Griddle>
   </div>
-)
+);
 
 
-export const Detail = ({ match }) => (
+export const Detail = ({ id, name, email, peopleFinderUrl }) => (
   <div>
-    <h2 className="heading-large">Detail View for Person id={ match.params.id }</h2>
+    <h2 className="heading-large">Detail View for Person</h2>
+    <ul>
+      <li>{ `name : ${name}` }</li>
+      <li>{ `email : ${email || ''}` }</li>
+      <li>people finder url: { peopleFinderUrl }</li>
+    </ul>
   </div>
 );
 
 
-export const Create = ({ match }) => (
-  <div>
-    <h2 className="heading-large">Create New Person</h2>
-  </div>
-);
+export class Create extends React.Component {
+
+  get isFormValid() {
+    const { newPerson } = this.props;
+    if (newPerson.name === '') {
+      return false;
+    }
+    if (newPerson.email === '') {
+      return false;
+    }
+    const values = Object.values(newPerson.errors)
+      .filter(val => val !== '');
+    return values.length === 0;
+  }
+
+  render() {
+    const {
+      newPerson,
+      handleNameChange,
+      handleEmailChange,
+      handlePeopleFinderUrlChange,
+      handleCreate
+    } = this.props;
+    return (
+      <div>
+        <h2 className="heading-large">Create New Person</h2>
+        <Input
+          name="name"
+          label="Name"
+          value={ newPerson.name }
+          error={ newPerson.errors.name }
+          onChange={ e => handleNameChange(e.target.value) }
+        />
+        <Input
+          name="email"
+          label="Email"
+          type="email"
+          value={ newPerson.email }
+          error={ newPerson.errors.email }
+          onChange={ e => handleEmailChange(e.target.value) }
+        />
+        <Input
+          name="peopleFinderUrl"
+          label="People Finder Link"
+          value={ newPerson.peopleFinderUrl }
+          error={ newPerson.errors.peopleFinderUrl }
+          onChange={ e => handlePeopleFinderUrlChange(e.target.value) }
+        />
+        <Button
+          type="submit"
+          value="Create"
+          disabled={ !this.isFormValid }
+          onClick={ handleCreate }
+        />
+      </div>
+    );
+  }
+}
 
 
 export const Update = ({ match }) => (

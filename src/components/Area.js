@@ -6,7 +6,7 @@ import Griddle, {
 } from 'griddle-react';
 
 import { enhancedWithRowData }from './Base';
-import CreateButton from './CreateButton';
+import { Input, TextArea, Select, Button } from './elements/form-elements';
 
 
 const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
@@ -79,81 +79,6 @@ export const Detail = ({ id, name, description, parent }) => {
 };
 
 
-const Name = ({ value, error, onChange }) => {
-  const divClassName = ! error ? "form-group" : "form-group form-group-error";
-  const inputClassName = ! error ? "form-control" : "form-control form-control-error";
-  return (
-    <div className={ divClassName }>
-      <label className="form-label-bold" htmlFor="name">Name</label>
-      {
-        ! error ? null : (
-            <span className="error-message">{ error }</span>
-        )
-      }
-      <input
-        id="name"
-        className={ inputClassName }
-        type="text"
-        name="name"
-        value={ value }
-        onChange={ onChange }
-      />
-    </div>
-  );
-};
-
-
-const Description = ({ value, error, onChange }) => {
-  const divClassName = ! error ? "form-group" : "form-group form-group-error";
-  const textAreaClassName = ! error ? "form-control" : "form-control form-control-error";
-  return (
-    <div className={ divClassName }>
-      <label className="form-label-bold" htmlFor="description">Description</label>
-      {
-        ! error ? null : (
-            <span className="error-message">{ error }</span>
-        )
-      }
-      <textarea
-        id="description"
-        className={ textAreaClassName }
-        type="text"
-        name="description"
-        value={ value }
-        onChange={ onChange }
-      />
-    </div>
-  );
-}
-
-
-const Parent = ({ parentId, areas, onChange }) => {
-  return (
-    <div className="form-group">
-      <label className="form-label-bold" htmlFor="parent">Parent</label>
-      <select
-        id="parent"
-        className="form-control"
-        type="text"
-        name="parent"
-        value={ parentId }
-        onChange={ onChange }
-      >
-        <option value={ null }></option>
-        {
-          areas.map(
-            area => (
-              <option key={ area.id } value={ area.id }>
-                { area.name }
-              </option> )
-          )
-        }
-      </select>
-    </div>
-  );
-}
-
-
 export class Create extends React.Component {
 
   get isFormValid() {
@@ -178,22 +103,31 @@ export class Create extends React.Component {
     return (
       <div>
         <h2 className="heading-large">Create New Business Area</h2>
-        <Name
+        <Input
+          name="name"
+          label="Name"
           value={ newArea.name }
           error={ newArea.errors.name }
           onChange={ e => handleNameChange(e.target.value) }
         />
-        <Description
+        <TextArea
+          name="description"
+          label="Description"
           value={ newArea.description }
           error={ newArea.errors.description }
           onChange={ (e) => handleDescriptionChange(e.target.value) }
         />
-        <Parent
-          areas={ areas }
-          parentId={ newArea.parentId }
-          onChange={ (e) => handleParentChange(e.target.value) }
+        <Select
+          name="parent"
+          value={ newArea.parentId }
+          label="Parent"
+          error={ newArea.errors.parentId }
+          options={ areas.map(area => ({ value: area.id, label: area.name })) }
+          onChange={ item => handleParentChange(item ? item.value : null) }
         />
-        <CreateButton
+        <Button
+          type="submit"
+          value="Create"
           disabled={ !this.isFormValid }
           onClick={ handleCreate }
         />
