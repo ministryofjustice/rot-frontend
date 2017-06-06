@@ -4,6 +4,7 @@ import Griddle, {
   ColumnDefinition,
   plugins
 } from 'griddle-react';
+import { Link } from 'react-router-dom';
 
 import { enhancedWithRowData }from './Base';
 import { Input, TextArea, Select, Button } from './elements/form-elements';
@@ -19,12 +20,12 @@ const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
 
 
 const LinkToView = (props) => {
-  return <a href={ `/areas/${props.rowData.id}` }>{ props.value }</a>
+  return <Link to={ `/areas/${props.rowData.id}` }>{ props.value }</Link>
 };
 
 
 const ParentLink = ({ value }) => {
-  return <a href={ `/areas/${value.get('id') }` }>{ value.get('name') }</a>
+  return <Link to={ `/areas/${value.get('id') }` }>{ value.get('name') }</Link>
 };
 
 
@@ -32,7 +33,7 @@ export const List = ({ areas }) => {
   return (
   <div>
     <h2 className="heading-large">List View for Business Areas</h2>
-    <a className="" href="/areas/new">+ Create New</a>
+    <Link to="/areas/new">+ Create New</Link>
     <Griddle
       data={ areas }
       plugins={[plugins.LocalPlugin]}
@@ -62,7 +63,7 @@ export const List = ({ areas }) => {
 
 export const Detail = ({ id, name, description, parent }) => {
   const Parent = parent ? (
-    <a href={`/areas/${parent.id}`}>{ parent.name }</a>
+    <Link to={`/areas/${parent.id}`}>{ parent.name }</Link>
   ) : (
     <span></span>
   );

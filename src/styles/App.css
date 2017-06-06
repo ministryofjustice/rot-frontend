@@ -35,3 +35,7 @@ nav li {
 nav li a {
   padding: 8px;
 }
+
+.float-right {
+  float: right;
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Griddle, {
   RowDefinition,
   ColumnDefinition,
@@ -19,12 +20,12 @@ const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
 
 
 const LinkToView = (props) => {
-  return <a href={ `/services/${props.rowData.id}` }>{ props.value }</a>
+  return <Link to={ `/services/${props.rowData.id}` }>{ props.value }</Link>
 };
 
 
 const OwnerLink = ({ value }) => {
-  return <a href={ `/persons/${value.get( 'id' ) }` }>{ value.get( 'name' ) }</a>
+  return <Link to={ `/persons/${value.get( 'id' ) }` }>{ value.get( 'name' ) }</Link>
 };
 
 const AreaLinks = ({ value }) => {
@@ -34,9 +35,9 @@ const AreaLinks = ({ value }) => {
       value.map((area, i) =>
         <span key={ area.get('id') }>
           { i > 0 ? ", " : null }
-          <a href={ `/areas/${ area.get('id') }` }>
+          <Link to={ `/areas/${ area.get('id') }` }>
             { area.get( 'name' ) }
-          </a>
+          </Link>
         </span>
       )
     }
@@ -45,14 +46,14 @@ const AreaLinks = ({ value }) => {
 
 
 const CategoryLink = ({ value }) => {
-  return <a href={ `/categories/${value.get( 'id' ) }` }>{ value.get( 'name' ) }</a>
+  return <Link to={ `/categories/${value.get( 'id' ) }` }>{ value.get( 'name' ) }</Link>
 };
 
 
 export const List = ( { services } ) => (
   <div>
     <h2 className="heading-large">All Services</h2>
-    <a className="" href="/services/new">+ Create New</a>
+    <Link to="/services/new">+ Create New</Link>
     <Griddle
       data={ services }
       plugins={[plugins.LocalPlugin]}
@@ -97,7 +98,7 @@ export const Detail = ({ id, name, description, owner, areas, category }) => {
   }
 
   const Owner = owner ? (
-    <a href={ `/persons/${owner.id}` }>{ owner.name }</a>
+    <Link to={ `/persons/${owner.id}` }>{ owner.name }</Link>
   ) : (
     <span></span>
   );
@@ -108,7 +109,7 @@ export const Detail = ({ id, name, description, owner, areas, category }) => {
       areas.map((area, i) =>
         <span key={ area.id }>
           { i > 0 ? ', ' : null }
-          <a href={ `/areas/${area.id}` }>{ area.name }</a>
+          <Link to={ `/areas/${area.id}` }>{ area.name }</Link>
         </span>
       )
     }
@@ -116,7 +117,7 @@ export const Detail = ({ id, name, description, owner, areas, category }) => {
   );
 
   const Category = category ? (
-    <a href={ `/categories/${category.id}` }>{ category.name }</a>
+    <Link to={ `/categories/${category.id}` }>{ category.name }</Link>
   ) : (
     <span></span>
   );

@@ -1,3 +1,4 @@
+import queryString from 'query-string';
 import { put, fork, take, select, call } from 'redux-saga/effects';
 import { randomString } from '../utils';
 
@@ -123,10 +124,66 @@ export function* createNewCategory(baseURL, history) {
 }
 
 
-export default function* root(baseURL, history) {
+export function* login(baseURL, history, clientId, oAuthURL) {
+  while(true) {
+    const endpoint = `${oAuthURL}/token/`;
+    const { code } = yield take('OAUTH_CODE_SUBMITTED');
+    const redirectURI = 'http://reg.pokearound.co.uk/oauth';
+    const body = {
+      'grant_type': 'authorization_code',
+      'redirect_uri': redirectURI,
+      'code': code,
+      'client_id': clientId
+    }
+    const init = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: queryString.stringify(body)
+    };
+    const response = yield fetch(endpoint, init);
+    const data = yield response.json();
+    const tokens = {
+      accessToken: data['access_token'],
+      refreshToken: data['refresh_token']
+    };
+    const redirectURL = yield select(state => state.user.redirectURL);
+    yield put({ type: 'USER_AUTHENTICATED', tokens });
+    history.push(redirectURL);
+  }
+}
+
+
+export function* logout(baseURL, history, clientId, oAuthURL) {
+  while(true) {
+    const endpoint = `${oAuthURL}/revoke_token/`;
+    yield take('LOGOUT_STARTED');
+    const user = yield select(state => state.user);
+    const body = {
+      'token': user.tokens.accessToken,
+      'client_id': clientId
+    };
+    const init = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: queryString.stringify(body)
+    };
+    const response = yield fetch(endpoint, init);
+    yield put({ type: 'LOGOUT_SUCCEEDED' });
+    
+  }
+}
+
+
+export default function* root(baseURL, history, clientId, oAuthURL) {
   yield fork(fetchData, baseURL);
   yield fork(createNewArea, baseURL, history);
   yield fork(createNewService, baseURL, history);
   yield fork(createNewPerson, baseURL, history);
   yield fork(createNewCategory, baseURL, history);
+  yield fork(login, baseURL, history, clientId, oAuthURL);
+  yield fork(logout, baseURL, history, clientId, oAuthURL);
 }

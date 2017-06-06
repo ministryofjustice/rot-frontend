@@ -4,14 +4,15 @@ import Griddle, {
   ColumnDefinition,
   plugins
 } from 'griddle-react';
+import { Link } from 'react-router-dom';
 import { enhancedWithRowData }from './Base';
 import { Input, Button } from './elements/form-elements';
 
 
 const LinkToView = ({ rowData, value }) => (
-  <a href={ `/persons/${ rowData.id }` }>
+  <Link to={ `/persons/${ rowData.id }` }>
     { value }
-  </a>
+  </Link>
 );
 
 
@@ -25,14 +26,14 @@ const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
 
 
 const URL = ({ value }) => {
-  return <a href={ value }>{ value }</a>
+  return <Link to={ value }>{ value }</Link>
 }
 
 
 export const List = ({ persons }) => (
   <div>
     <h2 className="heading-large">List View for Persons</h2>
-    <a className="" href="/persons/new">+ Create New</a>
+    <Link to="/persons/new">+ Create New</Link>
     <Griddle
       data={ persons }
       plugins={[plugins.LocalPlugin]}

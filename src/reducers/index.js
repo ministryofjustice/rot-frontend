@@ -5,6 +5,8 @@ import area from './area';
 import service from './service';
 import person from './person';
 import category from './category';
+import user from './user';
+import rehydrate from './rehydrate';
 
 
 const reducer = combineReducers({
@@ -12,6 +14,8 @@ const reducer = combineReducers({
   person,
   area,
   category,
+  user,
+  rehydrate,
   routing: routerReducer
 });
 

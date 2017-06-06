@@ -4,6 +4,7 @@ import Griddle, {
   ColumnDefinition,
   plugins
 } from 'griddle-react';
+import { Link } from 'react-router-dom';
 
 import { enhancedWithRowData }from './Base';
 import { Input, TextArea, Select, Button } from './elements/form-elements';
@@ -19,12 +20,12 @@ const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
 
 
 const LinkToView = (props) => {
-  return <a href={ `/categories/${props.rowData.id}` }>{ props.value }</a>
+  return <Link to={ `/categories/${props.rowData.id}` }>{ props.value }</Link>
 };
 
 
 const ParentLink = ({ value }) => {
-  return <a href={ `/categories/${value.get('id') }` }>{ value.get('name') }</a>
+  return <Link to={ `/categories/${value.get('id') }` }>{ value.get('name') }</Link>
 };
 
 
@@ -34,7 +35,7 @@ export const Detail = ({ id, name, description, parent }) => {
   }
 
   const Parent = parent ? (
-    <a href={ `/categories/${parent.id}` }>{ parent.name }</a>
+    <Link to={ `/categories/${parent.id}` }>{ parent.name }</Link>
   ) : (
     <span></span>
   );
@@ -126,7 +127,7 @@ export const Delete = ({ match }) => (
 export const List = ({ categories }) => (
   <div>
     <h2 className="heading-large">List View for Categories</h2>
-    <a className="" href="/categories/new">+ Create New</a>
+    <Link to="/categories/new">+ Create New</Link>
     <Griddle
       data={ categories }
       plugins={ [plugins.LocalPlugin] }
