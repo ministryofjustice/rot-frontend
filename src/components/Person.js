@@ -1,4 +1,5 @@
 import React from 'react';
+import Portal from 'react-portal';
 import Griddle, {
   RowDefinition,
   ColumnDefinition,
@@ -7,6 +8,8 @@ import Griddle, {
 import { Link } from 'react-router-dom';
 import { enhancedWithRowData }from './Base';
 import { Input, Button } from './elements/form-elements';
+import { Confirm } from './elements/portals';
+import { VisibleToAuthenticated } from '../containers/AuthContainers';
 
 
 const LinkToView = ({ rowData, value }) => (
@@ -61,16 +64,37 @@ export const List = ({ persons }) => (
 );
 
 
-export const Detail = ({ id, name, email, peopleFinderUrl }) => (
-  <div>
-    <h2 className="heading-large">Detail View for Person</h2>
-    <ul>
-      <li>{ `name : ${name}` }</li>
-      <li>{ `email : ${email || ''}` }</li>
-      <li>people finder url: { peopleFinderUrl }</li>
-    </ul>
-  </div>
-);
+export const Detail = ({ id, name, email, peopleFinderUrl, handleEdit, handleDelete }) => {
+
+  const btnDelete = (
+    <button>Delete</button>
+  );
+
+  const ControlPanel = VisibleToAuthenticated(() => (
+    <div>
+      <button onClick={ () => handleEdit(id) }>
+        Edit
+      </button>
+      <Portal closeOnEsc closeOnOutsideClick={ false } openByClickOn={ btnDelete }>
+        <Confirm onYes={ () => handleDelete(id) }>
+          <h2>Are you sure?</h2>
+        </Confirm>
+      </Portal>
+    </div>
+  ));
+
+  return (
+    <div>
+      <h2 className="heading-large">Detail View for Person</h2>
+      <ul>
+        <li>{ `name : ${name}` }</li>
+        <li>{ `email : ${email || ''}` }</li>
+        <li>people finder url: { peopleFinderUrl }</li>
+      </ul>
+      <ControlPanel/>
+    </div>
+  );
+}
 
 
 export class Create extends React.Component {
@@ -136,14 +160,5 @@ export class Create extends React.Component {
 export const Update = ({ match }) => (
   <div>
     <h2 className="heading-large">Update Person id={ match.params.id }</h2>
-  </div>
-);
-
-
-export const Delete = ({ match }) => (
-  <div>
-    <h2 className="heading-large">Delete Person id={ match.params.id }?</h2>
-    <button>yes</button>
-    <button>no</button>
   </div>
 );

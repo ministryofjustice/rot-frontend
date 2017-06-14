@@ -34,7 +34,7 @@ export const CreateContainer = connect(
     handleCategoryChange: (categoryId) => dispatch({
       type: 'NEW_SERVICE_CATEGORY_CHANGED',
       categoryId
-    })
+    }),
   })
 )(Create);
 
@@ -46,7 +46,17 @@ export const DetailContainer = connect(
       return {};
     }
     return service;
-  }
+  },
+  dispatch => ({
+    handleEdit: (id) => dispatch({
+      type: 'SERVICE_EDIT_STARTED',
+      id
+    }),
+    handleDelete: (id) => dispatch({
+      type: 'SERVICE_DELETE_STARTED',
+      id
+    }),
+  })
 )(Detail);
 
 

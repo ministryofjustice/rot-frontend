@@ -15,7 +15,13 @@ export const DetailContainer = connect(
       return {};
     }
     return instance;
-  }
+  },
+  dispatch => ({
+    handleDelete: (id) => dispatch({
+      type: 'PERSON_DELETE_STARTED',
+      id
+    })
+  })
 )(Detail);
 
 

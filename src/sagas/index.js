@@ -38,6 +38,24 @@ export function* createNewArea(baseURL, history) {
 }
 
 
+export function* deleteArea(baseURL, history) {
+  while(true) {
+    const { id } = yield take('AREA_DELETE_STARTED');
+    const rsp = yield fetch(`${baseURL}/organisations/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (rsp.ok) {
+      yield put({ type: 'AREA_DELETE_SUCCEEDED', id });
+      yield call(fetchData, baseURL);
+      history.push(`/areas`);
+    } else {
+      yield put({ type: 'AREA_DELETE_FAILED', id })
+    }
+  }
+}
+
+
 export function* createNewService(baseURL, history) {
   while(true) {
     yield take('NEW_SERVICE_CREATE_STARTED');
@@ -68,6 +86,42 @@ export function* createNewService(baseURL, history) {
 }
 
 
+export function* deleteService(baseURL, history) {
+  while(true) {
+    const { id } = yield take('SERVICE_DELETE_STARTED');
+    const rsp = yield fetch(`${baseURL}/services/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (rsp.ok) {
+      yield put({ type: 'SERVICE_DELETE_SUCCEEDED', id });
+      yield call(fetchData, baseURL);
+      history.push(`/services`);
+    } else {
+      yield put({ type: 'SERVICE_DELETE_FAILED', id })
+    }
+  }
+}
+
+
+export function* deleteCategory(baseURL, history) {
+  while(true) {
+    const { id } = yield take('CATEGORY_DELETE_STARTED');
+    const rsp = yield fetch(`${baseURL}/categories/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (rsp.ok) {
+      yield put({ type: 'CATEGORY_DELETE_SUCCEEDED', id });
+      yield call(fetchData, baseURL);
+      history.push(`/categories`);
+    } else {
+      yield put({ type: 'CATEGORY_DELETE_FAILED', id })
+    }
+  }
+}
+
+
 export function* createNewPerson(baseURL, history) {
   while(true) {
     yield take('NEW_PERSON_CREATE_STARTED');
@@ -91,6 +145,24 @@ export function* createNewPerson(baseURL, history) {
       yield call(fetchData, baseURL);
     } else {
       yield put({ type: 'NEW_PERSON_CREATE_FAILED', data });
+    }
+  }
+}
+
+
+export function* deletePerson(baseURL, history) {
+  while(true) {
+    const { id } = yield take('PERSON_DELETE_STARTED');
+    const rsp = yield fetch(`${baseURL}/owners/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (rsp.ok) {
+      yield put({ type: 'PERSON_DELETE_SUCCEEDED', id });
+      yield call(fetchData, baseURL);
+      history.push(`/persons`);
+    } else {
+      yield put({ type: 'PERSON_DELETE_FAILED', id })
     }
   }
 }
@@ -171,7 +243,7 @@ export function* logout(baseURL, history, clientId, oAuthURL) {
       },
       body: queryString.stringify(body)
     };
-    const response = yield fetch(endpoint, init);
+    yield fetch(endpoint, init);
     yield put({ type: 'LOGOUT_SUCCEEDED' });
     
   }
@@ -181,9 +253,13 @@ export function* logout(baseURL, history, clientId, oAuthURL) {
 export default function* root(baseURL, history, clientId, oAuthURL) {
   yield fork(fetchData, baseURL);
   yield fork(createNewArea, baseURL, history);
+  yield fork(deleteArea, baseURL, history);
   yield fork(createNewService, baseURL, history);
+  yield fork(deleteService, baseURL, history);
   yield fork(createNewPerson, baseURL, history);
+  yield fork(deletePerson, baseURL, history);
   yield fork(createNewCategory, baseURL, history);
+  yield fork(deleteCategory, baseURL, history);
   yield fork(login, baseURL, history, clientId, oAuthURL);
   yield fork(logout, baseURL, history, clientId, oAuthURL);
 }

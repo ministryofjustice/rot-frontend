@@ -1,4 +1,5 @@
 import React from 'react';
+import Portal from 'react-portal';
 import { Link } from 'react-router-dom';
 import Griddle, {
   RowDefinition,
@@ -8,6 +9,8 @@ import Griddle, {
 
 import { enhancedWithRowData } from './Base';
 import { Input, TextArea, Select, Button } from './elements/form-elements';
+import { Confirm } from './elements/portals';
+import { VisibleToAuthenticated } from '../containers/AuthContainers';
 
 
 const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
@@ -91,7 +94,7 @@ export const List = ( { services } ) => (
 );
 
 
-export const Detail = ({ id, name, description, owner, areas, category }) => {
+export const Detail = ({ id, name, description, owner, areas, category, handleEdit, handleDelete }) => {
   // TODO better handling
   if (typeof id === 'undefined') {
     return null;
@@ -122,6 +125,23 @@ export const Detail = ({ id, name, description, owner, areas, category }) => {
     <span></span>
   );
 
+  const btnDelete = (
+    <button>Delete</button>
+  );
+
+  const ControlPanel = VisibleToAuthenticated(() => (
+    <div>
+      <button onClick={ () => handleEdit(id) }>
+        Edit
+      </button>
+      <Portal closeOnEsc closeOnOutsideClick={ false } openByClickOn={ btnDelete }>
+        <Confirm onYes={ () => handleDelete(id) }>
+          <h2>Are you sure?</h2>
+        </Confirm>
+      </Portal>
+    </div>
+  ));
+
   return (
     <div>
       <h2 className="heading-large">Detail View for Service</h2>
@@ -132,6 +152,7 @@ export const Detail = ({ id, name, description, owner, areas, category }) => {
         <li>business areas: { Areas }</li>
         <li>category: { Category }</li>
       </ul>
+      <ControlPanel/>
     </div>
   );
 };
@@ -224,14 +245,5 @@ export class Create extends React.Component {
 export const Update = ({ match }) => (
   <div>
     <h2>Update Service id={ match.params.id }</h2>
-  </div>
-);
-
-
-export const Delete = ({ match }) => (
-  <div>
-    <h2>Delete Service id={ match.params.id }?</h2>
-    <button>yes</button>
-    <button>no</button>
   </div>
 );

@@ -1,4 +1,5 @@
 import React from 'react';
+import Portal from 'react-portal';
 import Griddle, {
   RowDefinition,
   ColumnDefinition,
@@ -8,6 +9,8 @@ import { Link } from 'react-router-dom';
 
 import { enhancedWithRowData }from './Base';
 import { Input, TextArea, Select, Button } from './elements/form-elements';
+import { Confirm } from './elements/portals';
+import { VisibleToAuthenticated } from '../containers/AuthContainers';
 
 
 const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
@@ -61,12 +64,30 @@ export const List = ({ areas }) => {
 )}
 
 
-export const Detail = ({ id, name, description, parent }) => {
+export const Detail = ({ id, name, description, parent, handleEdit, handleDelete }) => {
   const Parent = parent ? (
     <Link to={`/areas/${parent.id}`}>{ parent.name }</Link>
   ) : (
     <span></span>
   );
+
+  const btnDelete = (
+    <button>Delete</button>
+  );
+
+  const ControlPanel = VisibleToAuthenticated(() => (
+    <div>
+      <button onClick={ () => handleEdit(id) }>
+        Edit
+      </button>
+      <Portal closeOnEsc closeOnOutsideClick={ false } openByClickOn={ btnDelete }>
+        <Confirm onYes={ () => handleDelete(id) }>
+          <h2>Are you sure?</h2>
+        </Confirm>
+      </Portal>
+    </div>
+  ));
+
   return (
     <div>
       <h2 className="heading-large">Detail View for Business Area</h2>
@@ -75,6 +96,7 @@ export const Detail = ({ id, name, description, parent }) => {
         <li>{ `description : ${ description || ''}` }</li>
         <li>parent: {  Parent }</li>
       </ul>
+      <ControlPanel/>
     </div>
   );
 };
@@ -141,14 +163,5 @@ export class Create extends React.Component {
 export const Update = ({ match }) => (
   <div>
     <h2>Update Business Area id={ match.params.id }</h2>
-  </div>
-);
-
-
-export const Delete = ({ match }) => (
-  <div>
-    <h2>Delete Business Area id={ match.params.id }?</h2>
-    <button>yes</button>
-    <button>no</button>
   </div>
 );

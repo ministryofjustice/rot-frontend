@@ -41,5 +41,11 @@ export const DetailContainer = connect(
       return Object.assign({}, instance, { parent });
     }
     return {};
-  }
+  },
+  dispatch => ({
+    handleDelete: (id) => dispatch({
+      type: 'AREA_DELETE_STARTED',
+      id
+    })
+  })
 )(Detail);
