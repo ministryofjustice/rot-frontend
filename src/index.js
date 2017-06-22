@@ -29,8 +29,9 @@ const apiBaseURL = process.env.REACT_APP_API_URL
   || `http://${window.location.hostname}:3001`;
 const clientId = process.env.REACT_APP_CLIENT_ID;
 const oAuthURL = process.env.REACT_APP_OAUTH_URL;
+const appBaseURL = process.env.REACT_APP_URL || `http://localhost:3000`;
 
-sagaMiddleware.run(() => root(apiBaseURL, history, clientId, oAuthURL));
+sagaMiddleware.run(() => root(apiBaseURL, history, clientId, oAuthURL, appBaseURL));
 
 render(
   <Provider store={ store }>

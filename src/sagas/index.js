@@ -132,7 +132,7 @@ export function* createNewPerson(baseURL, history) {
         id: randomString(17),
         name: person.name,
         email: person.email,
-        peopleFinderUrl: person.peopleFinderUrl 
+        peopleFinderUrl: person.peopleFinderUrl
       }),
       headers: { 'Content-Type': 'application/json' }
     });
@@ -196,11 +196,11 @@ export function* createNewCategory(baseURL, history) {
 }
 
 
-export function* login(baseURL, history, clientId, oAuthURL) {
+export function* login(baseURL, history, clientId, oAuthURL, appBaseURL) {
   while(true) {
+    const redirectURI = `${appBaseURL}/oauth`;
     const endpoint = `${oAuthURL}/token/`;
     const { code } = yield take('OAUTH_CODE_SUBMITTED');
-    const redirectURI = 'http://reg.pokearound.co.uk/oauth';
     const body = {
       'grant_type': 'authorization_code',
       'redirect_uri': redirectURI,
@@ -245,12 +245,12 @@ export function* logout(baseURL, history, clientId, oAuthURL) {
     };
     yield fetch(endpoint, init);
     yield put({ type: 'LOGOUT_SUCCEEDED' });
-    
+
   }
 }
 
 
-export default function* root(baseURL, history, clientId, oAuthURL) {
+export default function* root(baseURL, history, clientId, oAuthURL, appBaseURL) {
   yield fork(fetchData, baseURL);
   yield fork(createNewArea, baseURL, history);
   yield fork(deleteArea, baseURL, history);
@@ -260,6 +260,6 @@ export default function* root(baseURL, history, clientId, oAuthURL) {
   yield fork(deletePerson, baseURL, history);
   yield fork(createNewCategory, baseURL, history);
   yield fork(deleteCategory, baseURL, history);
-  yield fork(login, baseURL, history, clientId, oAuthURL);
+  yield fork(login, baseURL, history, clientId, oAuthURL, appBaseURL);
   yield fork(logout, baseURL, history, clientId, oAuthURL);
 }
