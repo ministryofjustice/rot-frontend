@@ -1,10 +1,15 @@
 import { randomString } from '../utils';
 
+const apiBaseURL = process.env.REACT_APP_API_URL
+  || `http://${window.location.hostname}:3001`;
+const clientId = process.env.REACT_APP_CLIENT_ID;
+const oAuthURL = process.env.REACT_APP_OAUTH_URL;
+
 const cleanState = {
   username: '',
   tokens: {},
   redirectURL: '/',
-  loginURL: 'https://rot-dev.dsd.io/api/v1/o/authorize/?state=random_state_string&client_id=qKhUAV71zh0Bu2vhxXOew1aDGEzJNhXAXrdlbYe3&response_type=code'
+  loginURL: `${oAuthURL}/authorize/?state=random_state_string&client_id=${clientId}&response_type=code`
 };
 
 
