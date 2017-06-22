@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
 
-import Home from './Home';
 import * as Service from './Service';
 import * as Person from './Person';
 import * as Area from './Area';
@@ -11,12 +10,15 @@ import * as PersonContainers from '../containers/PersonContainers';
 import * as ServiceContainers from '../containers/ServiceContainers';
 import * as CategoryContainers from '../containers/CategoryContainers';
 import { LoginRequired } from '../containers/AuthContainers';
-import { NavBar } from './Nav';
 import { LoginContainer, LogoutContainer, LogInLinkContainer, OAuthContainer } from '../containers/LoginContainers';
 import ModelRoutes from './ModelRoutes';
+import { Header } from './elements/Header';
+import { Footer } from './elements/Footer';
 
 import 'react-select/dist/react-select.css';
 import '../styles/App.css';
+import '../styles/govuk-template.css';
+import '../styles/fonts.css';
 import '../styles/govuk-elements-styles.css';
 
 
@@ -50,12 +52,23 @@ class App extends Component {
     };
 
     return (
-      <main id="content" role="main">
-        <NavBar />
-        <LogInLinkContainer />
-        <Route exact path="/" component={ Home } />
-        <Route exact path="/login-required" component={ LoginContainer } />
-        <Route exact path="/logout" component={ LogoutContainer } /> <Route exact path="/oauth" component={ OAuthContainer } /> <ModelRoutes path="services" { ...serviceComponents } /> <ModelRoutes path="persons" { ...personComponents } /> <ModelRoutes path="areas" { ...areaComponents } /> <ModelRoutes path="categories" { ...categoryComponents } /> </main>);
+      <div>
+        <Header />
+        <div id="global-header-bar"></div>
+        <main id="content" role="main">
+          <LogInLinkContainer />
+          <Route exact path="/login-required" component={ LoginContainer } />
+          <Route exact path="/logout" component={ LogoutContainer } />
+          <Route exact path="/oauth" component={ OAuthContainer } />
+          <ModelRoutes path="/" { ...serviceComponents } />
+          <ModelRoutes path="services" { ...serviceComponents } />
+          <ModelRoutes path="persons" { ...personComponents } />
+          <ModelRoutes path="areas" { ...areaComponents } />
+          <ModelRoutes path="categories" { ...categoryComponents } />
+        </main>
+        <Footer />
+      </div>
+    );
   }
 }
 

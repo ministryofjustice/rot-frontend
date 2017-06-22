@@ -1,7 +1,5 @@
 import { randomString } from '../utils';
 
-const apiBaseURL = process.env.REACT_APP_API_URL
-  || `http://${window.location.hostname}:3001`;
 const clientId = process.env.REACT_APP_CLIENT_ID;
 const oAuthURL = process.env.REACT_APP_OAUTH_URL;
 
