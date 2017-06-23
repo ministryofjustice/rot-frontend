@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
 
-import * as Service from './Service';
 import * as Person from './Person';
 import * as Area from './Area';
 import * as Category from './Category';
@@ -30,7 +29,7 @@ class App extends Component {
       List: ServiceContainers.ListContainer,
       Detail: ServiceContainers.DetailContainer,
       Create: LoginRequired(ServiceContainers.CreateContainer),
-      Update: Service.Update,
+      Update: ServiceContainers.UpdateContainer,
     };
     const areaComponents = {
       List: AreaContainers.ListContainer,

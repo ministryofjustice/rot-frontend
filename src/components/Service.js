@@ -6,9 +6,10 @@ import Griddle, {
   ColumnDefinition,
   plugins
 } from 'griddle-react';
+import _ from 'lodash';
 
 import { enhancedWithRowData } from './Base';
-import { Input, TextArea, Select, Button } from './elements/form-elements';
+import { Input, TextArea, Select } from './elements/form-elements';
 import { Confirm } from './elements/portals';
 import { VisibleToAuthenticated } from '../containers/AuthContainers';
 
@@ -94,7 +95,7 @@ export const List = ( { services } ) => (
 );
 
 
-export const Detail = ({ id, name, description, owner, areas, category, handleEdit, handleDelete }) => {
+export const Detail = ({ id, name, description, owner, areas, category, handleDelete }) => {
   // TODO better handling
   if (typeof id === 'undefined') {
     return null;
@@ -126,20 +127,21 @@ export const Detail = ({ id, name, description, owner, areas, category, handleEd
   );
 
   const btnDelete = (
-    <button>Delete</button>
+    <a className="button">Delete</a>
   );
 
   const ControlPanel = VisibleToAuthenticated(() => (
-    <div>
-      <button onClick={ () => handleEdit(id) }>
-        Edit
-      </button>
+    <fieldset className="inline">
+      <Link to={`/services/${id}/update`} className="button">
+        Update
+      </Link>
+      <span>{'\u00A0\u00A0'}</span>
       <Portal closeOnEsc closeOnOutsideClick={ false } openByClickOn={ btnDelete }>
         <Confirm onYes={ () => handleDelete(id) }>
           <h2>Are you sure?</h2>
         </Confirm>
       </Portal>
-    </div>
+    </fieldset>
   ));
 
   return (
@@ -158,92 +160,152 @@ export const Detail = ({ id, name, description, owner, areas, category, handleEd
 };
 
 
-export class Create extends React.Component {
+export class CreateOrUpdate extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = Object.assign({errors: {}}, props.service);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.state = Object.assign({errors: {}}, nextProps.service);
+  }
 
   get isFormValid() {
-    const { newService } = this.props;
-    if (newService.name === '') {
+    const {
+      name,
+      errors,
+      ownerId,
+      categoryId,
+      areaIds
+    } = this.state;
+    if (name === '' || ownerId === '' || areaIds.length === 0 || categoryId === null) {
       return false;
     }
-    if (newService.ownerId === '') {
-      return false;
-    }
-    if (newService.areaIds.length === 0) {
-      return false;
-    }
-    const values = Object.values(newService.errors)
+
+    const values = Object.values(errors)
       .filter(val => val !== '');
     return values.length === 0;
   }
 
+  get hasChanges() {
+    const attrs = [
+      'name',
+      'description',
+      'ownerId',
+      'categoryId',
+      'areaIds'
+    ];
+    return ! _.isEqual(
+      _.pick(this.props.service, attrs),
+      _.pick(this.state, attrs)
+    );
+  }
+
+  handleNameChange(name) {
+    const existing = this.props.services.find(
+      service => {
+        if (!service.name) return false;
+        const isSameName = service.name.toLowerCase() === name.toLowerCase();
+        const isSameService = service.id === this.state.id;
+        if (this.props.isCreate) {
+          return isSameName;
+        } else {
+          return isSameName && !isSameService;
+        }
+      }
+    );
+    const errMsg = existing !== undefined ? 'name already exists' : '';
+    const errors = Object.assign(
+        {},
+        this.state.errors,
+        { name: errMsg }
+    );
+    this.setState({ name, errors });
+  }
+
   render() {
     const {
-      newService,
+      isCreate,
       persons,
       categories,
       areas,
-      handleNameChange,
-      handleDescriptionChange,
-      handleOwnerChange,
-      handleAreasChange,
-      handleCategoryChange,
-      handleCreate
+      handleCreate,
+      handleUpdate
     } = this.props;
+    const {
+      id,
+      name,
+      errors,
+      description,
+      ownerId,
+      categoryId,
+      areaIds
+    } = this.state;
     return (
       <div>
-        <h2 className="heading-large">Create New Service</h2>
+        <h2 className="heading-large">{ isCreate ? 'Create Service' : 'Update Service' }</h2>
         <Input
           name="name"
           label="Name"
-          value={ newService.name }
-          error={ newService.errors.name }
-          onChange={ e => handleNameChange(e.target.value) }
+          value={ name }
+          error={ errors.name }
+          onChange={ e => this.handleNameChange(e.target.value) }
         />
         <TextArea
           name="description"
           label="Description"
-          value={ newService.description }
-          error={ newService.errors.description }
-          onChange={ (e) => handleDescriptionChange(e.target.value) }
+          value={ description }
+          error={ errors.description }
+          onChange={ (e) => this.setState({ description: e.target.value })}
         />
         <Select
           name="owner"
-          value={ newService.ownerId }
+          value={ ownerId }
           label="Owner"
-          error={ newService.errors.ownerId }
+          error={ errors.ownerId }
           options={ persons.map(person => ({ value: person.id, label: person.name })) }
-          onChange={ item => handleOwnerChange(item ? item.value : null) }
+          onChange={ item => this.setState({ ownerId: item ? item.value : null }) }
         />
         <Select
           name="category"
-          value={ newService.categoryId }
+          value={ categoryId }
           label="Catogory"
           options={ categories.map(category => ({ value: category.id, label: category.name })) }
-          error={ newService.errors.categoryId }
-          onChange={ item => handleCategoryChange(item ? item.value: null) }
+          error={ errors.categoryId }
+          onChange={ item => this.setState({ categoryId: item ? item.value: null }) }
         />
         <Select
           name="areas"
-          value={ newService.areaIds }
+          value={ areaIds }
           label="Areas"
           isMulti={ true }
           options={ areas.map(area => ( { value: area.id, label: area.name } )) }
-          onChange={ items => handleAreasChange(items.map(({ value }) => value)) }
+          onChange={ items => this.setState({ areaIds: items.map(({ value }) => value) }) }
         />
-        <Button
-          type="submit"
-          value="Create"
-          disabled={ !this.isFormValid }
-          onClick={ handleCreate }
-        />
+        <fieldset className="inline">
+          {
+            isCreate ? (
+              <a
+                className="button"
+                disabled={ !this.isFormValid }
+                onClick={ () => handleCreate(this.state) }
+              >Create</a>
+            ) : (
+              <a
+                className="button"
+                disabled={ !this.isFormValid || !this.hasChanges }
+                onClick={ () => handleUpdate(this.state) }
+              >Update</a>
+            )
+          }
+          <span>{'\u00A0\u00A0'}</span>
+          <Link
+            to={ isCreate ? '/services/' : `/services/${id}` }
+            className="button"
+          >Cancel</Link>
+        </fieldset>
       </div>
     );
   }
 }
-
-
-export const Update = ({ match }) => (
-  <div>
-    <h2>Update Service id={ match.params.id }</h2>
-  </div>
-);

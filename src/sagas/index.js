@@ -58,8 +58,7 @@ export function* deleteArea(baseURL, history) {
 
 export function* createNewService(baseURL, history) {
   while(true) {
-    yield take('NEW_SERVICE_CREATE_STARTED');
-    const service = yield select(state => state.service.newInstance);
+    const { service } = yield take('NEW_SERVICE_CREATE_STARTED');
     const rsp = yield fetch(`${baseURL}/services`, {
       method: 'POST',
       body: JSON.stringify({
@@ -85,6 +84,31 @@ export function* createNewService(baseURL, history) {
   }
 }
 
+
+export function* updateService(baseURL, history) {
+  while(true) {
+    const { service }= yield take('SERVICE_UPDATE_STARTED');
+    const rsp = yield fetch(`${baseURL}/services/${service.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        name: service.name,
+        description: service.description,
+        ownerId: service.ownerId,
+        areaIds: service.areaIds,
+        categoryId: service.categoryId
+      }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = yield rsp.json();
+    if (rsp.ok) {
+      yield put({ type: 'SERVICE_UPDATE_SUCCEEDED', data });
+      yield call(fetchData, baseURL);
+      history.push(`/services/${data.id}`);
+    } else {
+      yield put({ type: 'SERVICE_UPDATE_FAILED', data });
+    }
+  }
+}
 
 export function* deleteService(baseURL, history) {
   while(true) {
@@ -255,6 +279,7 @@ export default function* root(baseURL, history, clientId, oAuthURL, appBaseURL) 
   yield fork(createNewArea, baseURL, history);
   yield fork(deleteArea, baseURL, history);
   yield fork(createNewService, baseURL, history);
+  yield fork(updateService, baseURL, history);
   yield fork(deleteService, baseURL, history);
   yield fork(createNewPerson, baseURL, history);
   yield fork(deletePerson, baseURL, history);
