@@ -4,6 +4,7 @@ import { randomString } from '../utils';
 
 
 export function* fetchEndpointData(baseURL, pathName, eventType) {
+  // TODO - handle pagination
   const rsp = yield fetch(`${baseURL}/${pathName}`);
   const respJson = yield rsp.json();
   const data = respJson.results;
@@ -13,6 +14,7 @@ export function* fetchEndpointData(baseURL, pathName, eventType) {
 
 
 export function* fetchData(baseURL) {
+  // TODO - we do not need to be getting all this data all the time
   yield fork(fetchEndpointData, baseURL, 'people', 'FETCH_PERSON_DATA_SUCCEEDED');
   yield fork(fetchEndpointData, baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
   yield fork(fetchEndpointData, baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
