@@ -13,7 +13,7 @@ const processData = (state, action) => {
   const organisations = action.data
     .sort((a, b) => a.name > b.name ? 1 : -1);
   const all = organisations.map(area => {
-    let parent = organisations.find(item => item['id'] === area['parent']);
+    let parent = organisations.find(item => item['id'] === area['parent_id']);
     parent = typeof parent !== 'undefined' ? parent : new Map();
     return Object.assign({}, area, { parent });
   });
