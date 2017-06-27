@@ -58,7 +58,11 @@ const LinkToView = (props) => {
 
 const OwnerLink = (props) => {
   if (props.value !== null) {
-    return <Link to={ `/persons/${props.value.get( 'id' ) }` }>{ props.value.get( 'name' ) }</Link>
+    return (
+      <Link to={ `/persons/${props.value.get( 'id' ) }` }>
+        { props.value.get( 'first_name' ) } { props.value.get( 'last_name' ) }
+      </Link>
+    )
   }
   return null;
 };
