@@ -49,28 +49,37 @@ const Layout = ({ Table, Filter, Pagination, SettingsWrapper }) => (
 
 
 const LinkToView = (props) => {
-  return <Link to={ `/services/${props.rowData.id}` }>{ props.value }</Link>
+  if (props.value !== null) {
+    return <Link to={ `/services/${props.rowData.id}` }>{ props.value }</Link>
+  }
+  return null;
 };
 
 
-const OwnerLink = ({ value }) => {
-  return <Link to={ `/persons/${value.get( 'id' ) }` }>{ value.get( 'name' ) }</Link>
+const OwnerLink = (props) => {
+  if (props.value !== null) {
+    return <Link to={ `/persons/${props.value.get( 'id' ) }` }>{ props.value.get( 'name' ) }</Link>
+  }
+  return null;
 };
 
-const AreaLinks = ({ value }) => {
-  return (
-    <span>
-    {
-      value.map((area, i) =>
-        <span key={ area.get('id') }>
-          { i > 0 ? ", " : null }
-          <Link to={ `/areas/${ area.get('id') }` }>
-            { area.get( 'name' ) }
-          </Link>
-        </span>
-      )
-    }
-    </span>)
+const AreaLinks = (props) => {
+  if (props.value !== null) {
+    return (
+      <span>
+      {
+        props.value.map((area, i) =>
+          <span key={ area.get('id') }>
+            { i > 0 ? ", " : null }
+            <Link to={ `/areas/${ area.get('id') }` }>
+              { area.get( 'name' ) }
+            </Link>
+          </span>
+        )
+      }
+      </span>)
+  }
+  return null;
 };
 
 
@@ -79,8 +88,9 @@ const CategoryLink = ({ value }) => {
 };
 
 
-export const List = ( { services } ) => (
-  <div>
+export const List = ( { services } ) => {
+  return (
+    <div>
     <h2 className="heading-large">All Services</h2>
     <Griddle
       data={ services }
@@ -122,6 +132,7 @@ export const List = ( { services } ) => (
     </Griddle>
   </div>
 );
+}
 
 
 export const Detail = ({ id, name, description, owner, areas, category, handleDelete }) => {

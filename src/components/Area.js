@@ -27,8 +27,11 @@ const LinkToView = (props) => {
 };
 
 
-const ParentLink = ({ value }) => {
-  return <Link to={ `/areas/${value.get('id') }` }>{ value.get('name') }</Link>
+const ParentLink = ( props ) => {
+  if (props.value !== null) {
+    return <Link to={ `/areas/${props.value.get('id') }` }>{ props.value.get('name') }</Link>
+  }
+  return null;
 };
 
 

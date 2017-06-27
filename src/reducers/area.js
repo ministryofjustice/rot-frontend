@@ -10,10 +10,10 @@ const cleanState = {
 
 
 const processData = (state, action) => {
-  const organisations = action.data.organisations
+  const organisations = action.data
     .sort((a, b) => a.name > b.name ? 1 : -1);
   const all = organisations.map(area => {
-    let parent = organisations.find(item => item['id'] === area.parentId);
+    let parent = organisations.find(item => item['id'] === area['parent']);
     parent = typeof parent !== 'undefined' ? parent : new Map();
     return Object.assign({}, area, { parent });
   });
@@ -54,7 +54,7 @@ const handleCreateSucceed = (state, action) => {
 
 const area = (state = cleanState,  action) => {
   switch(action.type) {
-    case 'FETCH_DATA_SUCCEEDED':
+    case 'FETCH_AREA_DATA_SUCCEEDED':
       return processData(state, action);
     case 'NEW_AREA_NAME_CHANGED':
       return handleNameChange(state, action);

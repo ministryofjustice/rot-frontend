@@ -6,17 +6,17 @@ const cleanState = {
     parentId: '',
     errors: {}
   }
-}
+};
 
 
 const processData = (state, action) => {
-  const categories  = action.data.categories
+  const categories  = action.data
     .sort((a, b) => a.name > b.name ? 1 : -1);
   const all = categories.map(category => {
-    let parent = categories.find(item => item['id'] === category.parentId);
+    let parent = categories.find(item => item['id'] === category['parent']);
     parent = typeof parent !== 'undefined' ? parent : new Map();
     return Object.assign({}, category, { parent });
-  })
+  });
   return Object.assign({}, state, { all });
 };
 
@@ -48,7 +48,7 @@ const handleParentIdChange = (state, action) => {
 
 const category = (state=cleanState,  action) => {
   switch(action.type) {
-    case 'FETCH_DATA_SUCCEEDED':
+    case 'FETCH_CATEGORY_DATA_SUCCEEDED':
       return processData(state, action);
     case 'NEW_CATEGORY_NAME_CHANGED':
       return handleNameChange(state, action);

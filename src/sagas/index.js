@@ -3,10 +3,20 @@ import { put, fork, take, select, call } from 'redux-saga/effects';
 import { randomString } from '../utils';
 
 
+export function* fetchEndpointData(baseURL, pathName, eventType) {
+  const rsp = yield fetch(`${baseURL}/${pathName}`);
+  const respJson = yield rsp.json();
+  const data = respJson.results;
+
+  yield put({ type: eventType, data });
+}
+
+
 export function* fetchData(baseURL) {
-  const rsp = yield fetch(`${baseURL}/db`);
-  const data = yield rsp.json();
-  yield put({ type: 'FETCH_DATA_SUCCEEDED', data });
+  yield fork(fetchEndpointData, baseURL, 'people', 'FETCH_PERSON_DATA_SUCCEEDED');
+  yield fork(fetchEndpointData, baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
+  yield fork(fetchEndpointData, baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
+  yield fork(fetchEndpointData, baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED');
 }
 
 

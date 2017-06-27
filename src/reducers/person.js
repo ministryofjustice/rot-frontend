@@ -13,7 +13,7 @@ const cleanState = {
 
 
 const processData = (state, action) => {
-  const all = action.data.owners
+  const all = action.data
     .sort((a, b) => a.name > b.name ? 1 : -1);
   return Object.assign({}, state, { all });
 };
@@ -60,7 +60,7 @@ const handleCreateSucceed = (state, action) => {
 
 const person = (state = cleanState, action) => {
   switch(action.type) {
-    case 'FETCH_DATA_SUCCEEDED':
+    case 'FETCH_PERSON_DATA_SUCCEEDED':
       return processData(state, action);
     case 'NEW_PERSON_NAME_CHANGED':
       return handleNameChange(state, action);
