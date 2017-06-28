@@ -19,6 +19,8 @@ import '../styles/App.css';
 import '../styles/govuk-template.css';
 import '../styles/fonts.css';
 import '../styles/govuk-elements-styles.css';
+import '../styles/search.css';
+import '../styles/one-page.css';
 
 
 

@@ -19,6 +19,9 @@ export const Header = () => (
             <Link to="/" id="proposition-name">
               Find a technology or service
             </Link>
+            <Link to="/services/new" className="button blue float-right">
+              Add a service
+            </Link>
             <ul id="proposition-links">
             </ul>
           </nav>

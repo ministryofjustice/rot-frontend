@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Portal from 'react-portal';
 import { Link } from 'react-router-dom';
 import Griddle, {
@@ -14,7 +14,33 @@ import { Confirm } from './elements/portals';
 import { VisibleToAuthenticated } from '../containers/AuthContainers';
 
 
-const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
+const Filter = (props) => {
+  console.log(props);
+  return (
+    <div className="grid-row">
+    <div className="column-two-thirds">
+    <div className="mod-search">
+      <div className='form-group'>
+        <div className='mod-search-input-wrapper'>
+          <input
+            type="search"
+            name="query"
+            className="form-control mod-search-input focus"
+            placeholder="search"
+            onChange={ (e) => props.setFilter(e.target.value) }
+          />
+        </div>
+        <input type="submit" name="commit" value="Search" className="mod-search-submit" />
+      </div>
+    </div>
+    </div>
+    </div>
+  );
+}
+
+
+
+const Layout = ({ Table, Filter, Pagination, SettingsWrapper }) => (
   <div>
     <Filter />
     <Pagination />
@@ -57,12 +83,16 @@ const CategoryLink = ({ value }) => {
 export const List = ( { services } ) => (
   <div>
     <h2 className="heading-large">All Services</h2>
-    <Link to="/services/new">+ Create New</Link>
     <Griddle
       data={ services }
       plugins={[plugins.LocalPlugin]}
-      components={ { Layout } }
+      components={ { Layout, Filter } }
       pageProperties={ { pageSize: 20 } }
+      styleConfig={{
+        classNames: {
+          Filter: 'form-control mod-search-input'
+        }
+      }}
     >
       <RowDefinition>
         <ColumnDefinition
