@@ -219,11 +219,11 @@ export class CreateOrUpdate extends React.Component {
     const {
       name,
       errors,
-      ownerId,
-      categoryId,
-      areaIds
+      owner_id,
+      category_id,
+      areas
     } = this.state;
-    if (name === '' || ownerId === '' || areaIds.length === 0 || categoryId === null) {
+    if (name === '' || owner_id === '' || areas.length === 0 || category_id === null) {
       return false;
     }
 
@@ -236,9 +236,9 @@ export class CreateOrUpdate extends React.Component {
     const attrs = [
       'name',
       'description',
-      'ownerId',
-      'categoryId',
-      'areaIds'
+      'owner_id',
+      'category_id',
+      'area_ids'
     ];
     return ! _.isEqual(
       _.pick(this.props.service, attrs),
@@ -282,9 +282,9 @@ export class CreateOrUpdate extends React.Component {
       name,
       errors,
       description,
-      ownerId,
-      categoryId,
-      areaIds
+      owner_id,
+      category_id,
+      area_ids
     } = this.state;
     return (
       <div>
@@ -305,27 +305,27 @@ export class CreateOrUpdate extends React.Component {
         />
         <Select
           name="owner"
-          value={ ownerId }
+          value={ owner_id }
           label="Owner"
-          error={ errors.ownerId }
+          error={ errors.owner_id }
           options={ persons.map(person => ({ value: person.id, label: person.name })) }
-          onChange={ item => this.setState({ ownerId: item ? item.value : null }) }
+          onChange={ item => this.setState({ owner_id: item ? item.value : null }) }
         />
         <Select
           name="category"
-          value={ categoryId }
+          value={ category_id }
           label="Catogory"
           options={ categories.map(category => ({ value: category.id, label: category.name })) }
-          error={ errors.categoryId }
-          onChange={ item => this.setState({ categoryId: item ? item.value: null }) }
+          error={ errors.category_id }
+          onChange={ item => this.setState({ category_id: item ? item.value: null }) }
         />
         <Select
           name="areas"
-          value={ areaIds }
+          value={ area_ids }
           label="Areas"
           isMulti={ true }
           options={ areas.map(area => ( { value: area.id, label: area.name } )) }
-          onChange={ items => this.setState({ areaIds: items.map(({ value }) => value) }) }
+          onChange={ items => this.setState({ area_ids: items.map(({ value }) => value) }) }
         />
         <fieldset className="inline">
           {

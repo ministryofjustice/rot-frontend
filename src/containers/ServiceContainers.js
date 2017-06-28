@@ -33,9 +33,9 @@ export const CreateContainer = connect(
     service: {
       name: '',
       description: '',
-      ownerId: '',
-      categoryId: '',
-      areaIds: []
+      owner_id: '',
+      category_id: '',
+      area_ids: []
     }
   }),
   dispatch => ({
@@ -49,15 +49,15 @@ export const CreateContainer = connect(
 
 export const UpdateContainer = connect(
   (state, { match })=> {
-    let service = state.service.all
-      .find(it => it.id === match.params.id);
+    const allServices = mergeServices(state);
+    let service = allServices.find(it => it.id === Number.parseInt(match.params.id));
     if (typeof service === 'undefined') {
       service = {
         name: '',
         description: '',
-        ownerId: '',
-        categoryId: '',
-        areaIds: []
+        owner_id: '',
+        category_id: '',
+        area_ids: []
       };
     }
     return {
@@ -80,7 +80,8 @@ export const UpdateContainer = connect(
 
 export const DetailContainer = connect(
   (state, { match }) => {
-    const service = state.service.all.find(it => it.id === match.params.id);
+    const allServices = mergeServices(state);
+    const service = allServices.find(it => it.id === Number.parseInt(match.params.id));
     if (typeof service === 'undefined') {
       return {};
     }
