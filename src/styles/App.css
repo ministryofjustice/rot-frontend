@@ -68,3 +68,14 @@ nav li a {
 .button.blue:hover {
   background-color: #153b76;
 }
+
+.spinkit {
+  position: relative;
+  left: 45%;
+  z-index: 9999;
+  top: 200px;
+}
+
+main#content {
+  min-height: 400px;
+}
