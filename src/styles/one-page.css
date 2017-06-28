@@ -1,0 +1,19 @@
+/* one page friendliness */
+
+#global-header a:focus {
+  color: #fff;
+  outline: none;
+}
+
+#global-header #logo:focus {
+  border-bottom-color: transparent;
+}
+
+#global-header #logo:hover {
+  border-bottom-color: white; }
+
+
+#global-header .header-proposition a#proposition-name:focus {
+  color: #fff;
+  background-color: #000;
+}

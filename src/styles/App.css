@@ -60,3 +60,11 @@ nav li a {
   border: 1px solid #888;
   width: 20%;
 }
+
+.button.blue, .button.blue:visited {
+  background-color: #1a4a93;
+}
+
+.button.blue:hover {
+  background-color: #153b76;
+}
