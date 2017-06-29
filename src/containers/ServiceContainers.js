@@ -7,17 +7,24 @@ function mergeServices(state) {
   return state.service.all.map(service => {
       let owner = state.person.all.find(item => item['id'] === service['owner_id']);
       owner = typeof owner !== 'undefined' ? owner : new Map();
-      // todo - need to make the api return a list of ids
-      let serviceAreas = [state.area.all.find(item => item['id'] === service['area_id'])];
-      let category = state.category.all.find(item => item['id'] === service['category_id']);
-      category = typeof category !== 'undefined' ? category : new Map();
+
+      const areas = service.areas.map(areaId => {
+        return state.area.all.find(a => a['id'] === areaId);
+      });
+
+      const categories = service.categories.map(categoryId => {
+        let category = state.category.all.find(cat => cat['id'] === categoryId)
+        category = typeof category !== 'undefined' ? category : new Map();
+        return category
+      });
+
       return Object.assign(
+        service,
         {
-          areas: serviceAreas,
-          category,
+          areaObjects: areas,
+          categoryObjects: categories,
           owner
-        },
-        service
+        }
       );
     })
 }
@@ -34,8 +41,10 @@ export const CreateContainer = connect(
       name: '',
       description: '',
       owner_id: '',
-      category_id: '',
-      area_ids: []
+      categories: [],
+      areas: [],
+      catgegoryObjects: [],
+      areaObjects: []
     }
   }),
   dispatch => ({
@@ -56,8 +65,10 @@ export const UpdateContainer = connect(
         name: '',
         description: '',
         owner_id: '',
-        category_id: '',
-        area_ids: []
+        categories: [],
+        areas: [],
+        catgegoryObjects: [],
+        areaObjects: []
       };
     }
     return {

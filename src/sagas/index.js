@@ -26,10 +26,10 @@ export function* callAPIEndpointData(baseURL, pathName, eventType) {
 
 export function* callAPIData(baseURL) {
   // TODO - we do not need to be getting all this data all the time
-  yield fork(callAPIEndpointData, baseURL, 'people', 'FETCH_PERSON_DATA_SUCCEEDED');
-  yield fork(callAPIEndpointData, baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
-  yield fork(callAPIEndpointData, baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
-  yield fork(callAPIEndpointData, baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'people', 'FETCH_PERSON_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED');
 }
 
 
@@ -89,8 +89,8 @@ export function* createNewService(baseURL, history) {
         name: service.name,
         description: service.description,
         owner_id: service.owner_id,
-        area_ids: service.area_ids,
-        category_id: service.category_id
+        areas: service.areas,
+        categories: service.categories
       }),
       headers: { 'Content-Type': 'application/json' }
     });
@@ -117,8 +117,8 @@ export function* updateService(baseURL, history) {
         name: service.name,
         description: service.description,
         owner_id: service.owner_id,
-        area_ids: service.area_ids,
-        category_id: service.category_id
+        areas: service.areas,
+        categories: service.categories
       }),
       headers: { 'Content-Type': 'application/json' }
     });
