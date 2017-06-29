@@ -14,7 +14,7 @@ import { VisibleToAuthenticated } from '../containers/AuthContainers';
 
 const LinkToView = ({ rowData, value }) => (
   <Link to={ `/persons/${ rowData.id }` }>
-    { rowData.first_name + ' ' + rowData.last_name }
+    { rowData['first_name'] + ' ' + rowData['last_name'] }
   </Link>
 );
 
