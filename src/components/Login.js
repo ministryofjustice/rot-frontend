@@ -1,6 +1,7 @@
 import queryString from 'query-string';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import Spinner from 'react-spinkit';
 
 
 export const LoginLink = ({ loginURL, isUserLoggedIn, handleLoginClick, handleLogoutClick }) => (
@@ -71,13 +72,19 @@ export class Logout extends Component {
 
 export class OAuth extends Component {
 
-  componentWillMount() {
-    const { location, handleCode } = this.props;
-    const parsed = queryString.parse(location.search);
-    handleCode(parsed.code);
+  componentWillReceiveProps(nextProps) {
+    const { location, handleCode, rehydrated } = nextProps;
+    if (rehydrated) {
+      const parsed = queryString.parse(location.search);
+      handleCode(parsed.code);
+    }
   }
 
   render() {
-    return null;
+    return (
+      <div className="spinkit">
+        <Spinner name='three-bounch'/>
+      </div>
+    );
   }
 }

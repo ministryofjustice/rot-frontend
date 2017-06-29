@@ -1,13 +1,9 @@
 import { randomString } from '../utils';
 
-const clientId = process.env.REACT_APP_CLIENT_ID;
-const oAuthURL = process.env.REACT_APP_OAUTH_URL;
-
 const cleanState = {
   username: '',
   tokens: {},
   redirectURL: '/',
-  loginURL: `${oAuthURL}/authorize/?state=random_state_string&client_id=${clientId}&response_type=code`
 };
 
 
@@ -20,7 +16,7 @@ const user = (state = cleanState, action) => {
     case 'USER_AUTHENTICATED':
       return Object.assign({}, state, { tokens: action.tokens });
     case 'LOGOUT_SUCCEEDED':
-      return Object.assign({}, state, { tokens: {}, redirectURL: '/' });
+      return cleanState;
     default:
       if (state.username === '') {
         return Object.assign({}, state, {username: randomString()});

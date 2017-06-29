@@ -1,11 +1,12 @@
 import { connect } from 'react-redux';
 import { LoginLink, Login, Logout, OAuth } from '../components/Login'
+import { loginURL } from '../settings';
 
 
 export const LogInLinkContainer = connect(
   (state) => ({
     isUserLoggedIn: typeof state.user.tokens.accessToken !== 'undefined',
-    loginURL: state.user.loginURL
+    loginURL
   }),
   (dispatch) => ({
     handleLoginClick: (location) => dispatch({
@@ -39,7 +40,7 @@ export const LogoutContainer = connect(
 
 
 export const OAuthContainer = connect(
-  (state) => ({}),
+  (state) => ({ rehydrated: state.rehydrate.rehydrated }),
   (dispatch) => ({
     handleCode: (code) => dispatch({
       type: 'OAUTH_CODE_SUBMITTED',

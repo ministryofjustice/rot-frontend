@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Portal from 'react-portal';
 import { Link } from 'react-router-dom';
 import Griddle, {
@@ -15,7 +15,6 @@ import { VisibleToAuthenticated } from '../containers/AuthContainers';
 
 
 const Filter = (props) => {
-  console.log(props);
   return (
     <div className="grid-row">
     <div className="column-two-thirds">
