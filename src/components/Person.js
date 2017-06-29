@@ -14,7 +14,7 @@ import { VisibleToAuthenticated } from '../containers/AuthContainers';
 
 const LinkToView = ({ rowData, value }) => (
   <Link to={ `/persons/${ rowData.id }` }>
-    { value }
+    { rowData['first_name'] + ' ' + rowData['last_name'] }
   </Link>
 );
 
@@ -28,9 +28,12 @@ const Layout = ({ Table, Pagination, Filter, SettingsWrapper }) => (
 );
 
 
-const URL = ({ value }) => {
-  return <Link to={ value }>{ value }</Link>
-}
+const URL = (props) => {
+  if (props.value !== null) {
+    return <Link to={ props.value }>{ props.value }</Link>
+  }
+  return null;
+};
 
 
 export const List = ({ persons }) => (
@@ -45,7 +48,7 @@ export const List = ({ persons }) => (
     >
       <RowDefinition>
         <ColumnDefinition
-          id="name"
+          id="first_name"
           title="Name"
           customComponent={ enhancedWithRowData(LinkToView) }
         />
@@ -54,7 +57,7 @@ export const List = ({ persons }) => (
           title="Email"
         />
         <ColumnDefinition
-          id="peopleFinderUrl"
+          id="peoplefinder"
           title="People Finder URL"
           customComponent={ URL }
         />

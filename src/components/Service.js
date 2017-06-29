@@ -49,38 +49,67 @@ const Layout = ({ Table, Filter, Pagination, SettingsWrapper }) => (
 
 
 const LinkToView = (props) => {
-  return <Link to={ `/services/${props.rowData.id}` }>{ props.value }</Link>
+  if (props.value !== null) {
+    return <Link to={ `/services/${props.rowData.id}` }>{ props.value }</Link>
+  }
+  return null;
 };
 
 
-const OwnerLink = ({ value }) => {
-  return <Link to={ `/persons/${value.get( 'id' ) }` }>{ value.get( 'name' ) }</Link>
+const OwnerLink = (props) => {
+  if (props.value !== null) {
+    return (
+      <Link to={ `/persons/${props.value.get( 'id' ) }` }>
+        { props.value.get( 'first_name' ) } { props.value.get( 'last_name' ) }
+      </Link>
+    )
+  }
+  return null;
 };
 
-const AreaLinks = ({ value }) => {
+const AreaLinks = (props) => {
+  if (props.value !== null) {
+    return (
+      <span>
+      {
+        props.value.map((area, i) =>
+          <span key={ area.get('id') }>
+            { i > 0 ? ", " : null }
+            <Link to={ `/areas/${ area.get('id') }` }>
+              { area.get( 'name' ) }
+            </Link>
+          </span>
+        )
+      }
+      </span>)
+  }
+  return null;
+};
+
+
+const CategoryLinks = (props) => {
+  if (props.value !== null) {
+    return (
+      <span>
+      {
+        props.value.map((category, i) =>
+          <span key={ category.get('id') }>
+            { i > 0 ? ", " : null }
+            <Link to={ `/categories/${ category.get('id') }` }>
+              { category.get( 'name' ) }
+            </Link>
+          </span>
+        )
+      }
+      </span>)
+  }
+  return null;
+};
+
+
+export const List = ( { services } ) => {
   return (
-    <span>
-    {
-      value.map((area, i) =>
-        <span key={ area.get('id') }>
-          { i > 0 ? ", " : null }
-          <Link to={ `/areas/${ area.get('id') }` }>
-            { area.get( 'name' ) }
-          </Link>
-        </span>
-      )
-    }
-    </span>)
-};
-
-
-const CategoryLink = ({ value }) => {
-  return <Link to={ `/categories/${value.get( 'id' ) }` }>{ value.get( 'name' ) }</Link>
-};
-
-
-export const List = ( { services } ) => (
-  <div>
+    <div>
     <h2 className="heading-large">All Services</h2>
     <Griddle
       data={ services }
@@ -109,22 +138,23 @@ export const List = ( { services } ) => (
           customComponent={ OwnerLink }
         />
         <ColumnDefinition
-          id="areas"
+          id="areaObjects"
           title="Business Areas"
           customComponent={ AreaLinks }
         />
         <ColumnDefinition
-          id="category"
+          id="categoryObjects"
           title="Category"
-          customComponent={ CategoryLink }
+          customComponent={ CategoryLinks }
         />
       </RowDefinition>
     </Griddle>
   </div>
 );
+}
 
 
-export const Detail = ({ id, name, description, owner, areas, category, handleDelete }) => {
+export const Detail = ({ id, name, description, owner, areaObjects, categoryObjects, handleDelete }) => {
   // TODO better handling
   if (typeof id === 'undefined') {
     return null;
@@ -139,7 +169,7 @@ export const Detail = ({ id, name, description, owner, areas, category, handleDe
   const Areas = (
     <span>
     {
-      areas.map((area, i) =>
+      areaObjects.map((area, i) =>
         <span key={ area.id }>
           { i > 0 ? ', ' : null }
           <Link to={ `/areas/${area.id}` }>{ area.name }</Link>
@@ -149,10 +179,17 @@ export const Detail = ({ id, name, description, owner, areas, category, handleDe
     </span>
   );
 
-  const Category = category ? (
-    <Link to={ `/categories/${category.id}` }>{ category.name }</Link>
-  ) : (
-    <span></span>
+  const Categories = (
+    <span>
+    {
+      categoryObjects.map((category, i) =>
+        <span key={ category.id }>
+          { i > 0 ? ', ' : null }
+          <Link to={ `/categories/${category.id}` }>{ category.name }</Link>
+        </span>
+      )
+    }
+    </span>
   );
 
   const btnDelete = (
@@ -181,7 +218,7 @@ export const Detail = ({ id, name, description, owner, areas, category, handleDe
         <li>{ `description : ${description || ''}` }</li>
         <li>owner: { Owner }</li>
         <li>business areas: { Areas }</li>
-        <li>category: { Category }</li>
+        <li>categories: { Categories }</li>
       </ul>
       <ControlPanel/>
     </div>
@@ -204,11 +241,13 @@ export class CreateOrUpdate extends React.Component {
     const {
       name,
       errors,
-      ownerId,
-      categoryId,
-      areaIds
+      owner_id,
+      categories,
+      areas,
+      categoryObjects,
+      areaObjects
     } = this.state;
-    if (name === '' || ownerId === '' || areaIds.length === 0 || categoryId === null) {
+    if (name === '' || owner_id === '' || (areas && areas.length === 0) || (categories && categories.length === 0)) {
       return false;
     }
 
@@ -221,9 +260,9 @@ export class CreateOrUpdate extends React.Component {
     const attrs = [
       'name',
       'description',
-      'ownerId',
-      'categoryId',
-      'areaIds'
+      'owner_id',
+      'categories',
+      'areas'
     ];
     return ! _.isEqual(
       _.pick(this.props.service, attrs),
@@ -257,8 +296,8 @@ export class CreateOrUpdate extends React.Component {
     const {
       isCreate,
       persons,
-      categories,
       areas,
+      categories,
       handleCreate,
       handleUpdate
     } = this.props;
@@ -267,9 +306,9 @@ export class CreateOrUpdate extends React.Component {
       name,
       errors,
       description,
-      ownerId,
-      categoryId,
-      areaIds
+      owner_id,
+      categoryObjects,
+      areaObjects,
     } = this.state;
     return (
       <div>
@@ -290,27 +329,27 @@ export class CreateOrUpdate extends React.Component {
         />
         <Select
           name="owner"
-          value={ ownerId }
+          value={ owner_id }
           label="Owner"
-          error={ errors.ownerId }
+          error={ errors.owner_id }
           options={ persons.map(person => ({ value: person.id, label: person.name })) }
-          onChange={ item => this.setState({ ownerId: item ? item.value : null }) }
+          onChange={ item => this.setState({ owner_id: item ? item.value : null }) }
         />
         <Select
-          name="category"
-          value={ categoryId }
+          name="categories"
+          value={ this.state.categories }
           label="Catogory"
+          isMulti={ true }
           options={ categories.map(category => ({ value: category.id, label: category.name })) }
-          error={ errors.categoryId }
-          onChange={ item => this.setState({ categoryId: item ? item.value: null }) }
+          onChange={ items => this.setState({ categories: items.map(({ value }) => value) }) }
         />
         <Select
           name="areas"
-          value={ areaIds }
+          value={ this.state.areas }
           label="Areas"
           isMulti={ true }
           options={ areas.map(area => ( { value: area.id, label: area.name } )) }
-          onChange={ items => this.setState({ areaIds: items.map(({ value }) => value) }) }
+          onChange={ items => this.setState({ areas: items.map(({ value }) => value) }) }
         />
         <fieldset className="inline">
           {

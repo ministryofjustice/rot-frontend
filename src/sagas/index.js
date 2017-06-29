@@ -3,10 +3,33 @@ import { put, fork, take, select, call } from 'redux-saga/effects';
 import { randomString } from '../utils';
 
 
-export function* fetchData(baseURL) {
-  const rsp = yield fetch(`${baseURL}/db`);
-  const data = yield rsp.json();
-  yield put({ type: 'FETCH_DATA_SUCCEEDED', data });
+export function* callAPI(input, init={}) {
+  const user = yield select(state => state.user);
+  if (user && user.tokens && user.tokens.accessToken) {
+    init.headers = Object.assign({}, init.headers || {}, {
+      Authorization: `Bearer ${user.tokens.accessToken}`
+    });
+  }
+  return yield fetch(input, init);
+}
+
+
+export function* callAPIEndpointData(baseURL, pathName, eventType) {
+  // TODO - handle pagination
+  const rsp = yield callAPI(`${baseURL}/${pathName}`);
+  const respJson = yield rsp.json();
+  const data = respJson.results;
+
+  yield put({ type: eventType, data });
+}
+
+
+export function* callAPIData(baseURL) {
+  // TODO - we do not need to be getting all this data all the time
+  yield callAPIEndpointData(baseURL, 'people', 'FETCH_PERSON_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED');
 }
 
 
@@ -14,7 +37,7 @@ export function* createNewArea(baseURL, history) {
   while(true) {
     yield take('NEW_AREA_CREATE_STARTED');
     const area = yield select(state => state.area.newInstance);
-    const rsp = yield fetch(`${baseURL}/organisations`, {
+    const rsp = yield callAPI(`${baseURL}/areas`, {
       method: 'POST',
       body: JSON.stringify({
         id: randomString(17),
@@ -29,8 +52,8 @@ export function* createNewArea(baseURL, history) {
       yield put({ type: 'NEW_AREA_CREATE_SUCCEEDED', data });
       // redirect to the newly created area
       history.push(`/areas/${data.id}`);
-      // fetch data again
-      yield call(fetchData, baseURL);
+      // callAPI data again
+      yield call(callAPIData, baseURL);
     } else {
       yield put({ type: 'NEW_AREA_CREATE_FAILED', data });
     }
@@ -41,13 +64,13 @@ export function* createNewArea(baseURL, history) {
 export function* deleteArea(baseURL, history) {
   while(true) {
     const { id } = yield take('AREA_DELETE_STARTED');
-    const rsp = yield fetch(`${baseURL}/organisations/${id}`, {
+    const rsp = yield callAPI(`${baseURL}/areas/${id}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
     });
     if (rsp.ok) {
       yield put({ type: 'AREA_DELETE_SUCCEEDED', id });
-      yield call(fetchData, baseURL);
+      yield call(callAPIData, baseURL);
       history.push(`/areas`);
     } else {
       yield put({ type: 'AREA_DELETE_FAILED', id })
@@ -59,15 +82,15 @@ export function* deleteArea(baseURL, history) {
 export function* createNewService(baseURL, history) {
   while(true) {
     const { service } = yield take('NEW_SERVICE_CREATE_STARTED');
-    const rsp = yield fetch(`${baseURL}/services`, {
+    const rsp = yield callAPI(`${baseURL}/items`, {
       method: 'POST',
       body: JSON.stringify({
         id: randomString(17),
         name: service.name,
         description: service.description,
-        ownerId: service.ownerId,
-        areaIds: service.areaIds,
-        categoryId: service.categoryId
+        owner_id: service.owner_id,
+        areas: service.areas,
+        categories: service.categories
       }),
       headers: { 'Content-Type': 'application/json' }
     });
@@ -76,8 +99,8 @@ export function* createNewService(baseURL, history) {
       yield put({ type: 'NEW_SERVICE_CREATE_SUCCEEDED', data });
       // redirect to the newly created service
       history.push(`/services/${data.id}`);
-      // fetch data again
-      yield call(fetchData, baseURL);
+      // callAPI data again
+      yield call(callAPIData, baseURL);
     } else {
       yield put({ type: 'NEW_SERVICE_CREATE_FAILED', data });
     }
@@ -88,21 +111,21 @@ export function* createNewService(baseURL, history) {
 export function* updateService(baseURL, history) {
   while(true) {
     const { service }= yield take('SERVICE_UPDATE_STARTED');
-    const rsp = yield fetch(`${baseURL}/services/${service.id}`, {
+    const rsp = yield callAPI(`${baseURL}/items/${service.id}`, {
       method: 'PATCH',
       body: JSON.stringify({
         name: service.name,
         description: service.description,
-        ownerId: service.ownerId,
-        areaIds: service.areaIds,
-        categoryId: service.categoryId
+        owner_id: service.owner_id,
+        areas: service.areas,
+        categories: service.categories
       }),
       headers: { 'Content-Type': 'application/json' }
     });
     const data = yield rsp.json();
     if (rsp.ok) {
       yield put({ type: 'SERVICE_UPDATE_SUCCEEDED', data });
-      yield call(fetchData, baseURL);
+      yield call(callAPIData, baseURL);
       history.push(`/services/${data.id}`);
     } else {
       yield put({ type: 'SERVICE_UPDATE_FAILED', data });
@@ -113,13 +136,13 @@ export function* updateService(baseURL, history) {
 export function* deleteService(baseURL, history) {
   while(true) {
     const { id } = yield take('SERVICE_DELETE_STARTED');
-    const rsp = yield fetch(`${baseURL}/services/${id}`, {
+    const rsp = yield callAPI(`${baseURL}/items/${id}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
     });
     if (rsp.ok) {
       yield put({ type: 'SERVICE_DELETE_SUCCEEDED', id });
-      yield call(fetchData, baseURL);
+      yield call(callAPIData, baseURL);
       history.push(`/services`);
     } else {
       yield put({ type: 'SERVICE_DELETE_FAILED', id })
@@ -131,13 +154,13 @@ export function* deleteService(baseURL, history) {
 export function* deleteCategory(baseURL, history) {
   while(true) {
     const { id } = yield take('CATEGORY_DELETE_STARTED');
-    const rsp = yield fetch(`${baseURL}/categories/${id}`, {
+    const rsp = yield callAPI(`${baseURL}/categories/${id}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
     });
     if (rsp.ok) {
       yield put({ type: 'CATEGORY_DELETE_SUCCEEDED', id });
-      yield call(fetchData, baseURL);
+      yield call(callAPIData, baseURL);
       history.push(`/categories`);
     } else {
       yield put({ type: 'CATEGORY_DELETE_FAILED', id })
@@ -150,7 +173,7 @@ export function* createNewPerson(baseURL, history) {
   while(true) {
     yield take('NEW_PERSON_CREATE_STARTED');
     const person = yield select(state => state.person.newInstance);
-    const rsp = yield fetch(`${baseURL}/owners`, {
+    const rsp = yield callAPI(`${baseURL}/people`, {
       method: 'POST',
       body: JSON.stringify({
         id: randomString(17),
@@ -165,8 +188,8 @@ export function* createNewPerson(baseURL, history) {
       yield put({ type: 'NEW_PERSON_CREATE_SUCCEEDED', data });
       // redirect to the newly created service
       history.push(`/persons/${data.id}`);
-      // fetch data again
-      yield call(fetchData, baseURL);
+      // callAPI data again
+      yield call(callAPIData, baseURL);
     } else {
       yield put({ type: 'NEW_PERSON_CREATE_FAILED', data });
     }
@@ -177,13 +200,13 @@ export function* createNewPerson(baseURL, history) {
 export function* deletePerson(baseURL, history) {
   while(true) {
     const { id } = yield take('PERSON_DELETE_STARTED');
-    const rsp = yield fetch(`${baseURL}/owners/${id}`, {
+    const rsp = yield callAPI(`${baseURL}/people/${id}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
     });
     if (rsp.ok) {
       yield put({ type: 'PERSON_DELETE_SUCCEEDED', id });
-      yield call(fetchData, baseURL);
+      yield call(callAPIData, baseURL);
       history.push(`/persons`);
     } else {
       yield put({ type: 'PERSON_DELETE_FAILED', id })
@@ -196,7 +219,7 @@ export function* createNewCategory(baseURL, history) {
   while(true) {
     yield take('NEW_CATEGORY_CREATE_STARTED');
     const category = yield select(state => state.category.newInstance);
-    const rsp = yield fetch(`${baseURL}/categories`, {
+    const rsp = yield callAPI(`${baseURL}/categories`, {
       method: 'POST',
       body: JSON.stringify({
         id: randomString(17),
@@ -211,8 +234,8 @@ export function* createNewCategory(baseURL, history) {
       yield put({ type: 'NEW_CATEGORY_CREATE_SUCCEEDED', data });
       // redirect to the newly created category
       history.push(`/categories/${data.id}`);
-      // fetch data again
-      yield call(fetchData, baseURL);
+      // callAPI data again
+      yield call(callAPIData, baseURL);
     } else {
       yield put({ type: 'NEW_CATEGORY_CREATE_FAILED', data });
     }
@@ -238,7 +261,7 @@ export function* login(baseURL, history, clientId, oAuthURL, appBaseURL) {
       },
       body: queryString.stringify(body)
     };
-    const response = yield fetch(endpoint, init);
+    const response = yield callAPI(endpoint, init);
     const data = yield response.json();
     const tokens = {
       accessToken: data['access_token'],
@@ -267,7 +290,7 @@ export function* logout(baseURL, history, clientId, oAuthURL) {
       },
       body: queryString.stringify(body)
     };
-    yield fetch(endpoint, init);
+    yield callAPI(endpoint, init);
     yield put({ type: 'LOGOUT_SUCCEEDED' });
 
   }
@@ -275,7 +298,7 @@ export function* logout(baseURL, history, clientId, oAuthURL) {
 
 
 export default function* root(baseURL, history, clientId, oAuthURL, appBaseURL) {
-  yield fork(fetchData, baseURL);
+  yield fork(callAPIData, baseURL);
   yield fork(createNewArea, baseURL, history);
   yield fork(deleteArea, baseURL, history);
   yield fork(createNewService, baseURL, history);
