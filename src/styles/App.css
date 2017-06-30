@@ -79,3 +79,22 @@ nav li a {
 main#content {
   min-height: 400px;
 }
+
+.card {
+  margin-top: 16px;
+}
+
+.card .grid-row {
+  margin-top: 1px;
+  background-color: #e2e2e2;
+}
+
+.card div.column-one-third,  .card div.column-two-thirds {
+  background-color: e2e2e2;
+  border-left-color: white;
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-right-color: white;
+  border-right-width: 1px;
+  border-right-style: solid;
+}

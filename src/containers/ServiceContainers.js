@@ -6,7 +6,7 @@ import { CreateOrUpdate, List, Detail } from '../components/Service';
 function mergeServices(state) {
   return state.service.all.map(service => {
       let owner = state.person.all.find(item => item['id'] === service['owner_id']);
-      owner = typeof owner !== 'undefined' ? owner : new Map();
+      owner = typeof owner !== 'undefined' ? owner : {};
 
       const areas = service.areas.map(areaId => {
         return state.area.all.find(a => a['id'] === areaId);
@@ -14,7 +14,7 @@ function mergeServices(state) {
 
       const categories = service.categories.map(categoryId => {
         let category = state.category.all.find(cat => cat['id'] === categoryId)
-        category = typeof category !== 'undefined' ? category : new Map();
+        category = typeof category !== 'undefined' ? category : {};
         return category
       });
 
@@ -59,7 +59,7 @@ export const CreateContainer = connect(
 export const UpdateContainer = connect(
   (state, { match })=> {
     const allServices = mergeServices(state);
-    let service = allServices.find(it => it.id === Number.parseInt(match.params.id));
+    let service = allServices.find(it => it.id === Number.parseInt(match.params.id, 10));
     if (typeof service === 'undefined') {
       service = {
         name: '',
@@ -92,7 +92,7 @@ export const UpdateContainer = connect(
 export const DetailContainer = connect(
   (state, { match }) => {
     const allServices = mergeServices(state);
-    const service = allServices.find(it => it.id === Number.parseInt(match.params.id));
+    const service = allServices.find(it => it.id === Number.parseInt(match.params.id, 10));
     if (typeof service === 'undefined') {
       return {};
     }
@@ -109,6 +109,8 @@ export const DetailContainer = connect(
 
 export const ListContainer = connect(
   state => ({
-    services: mergeServices(state)
+    services: mergeServices(state),
+    areas: state.area.all,
+    categories: state.category.all
   })
 )(List);

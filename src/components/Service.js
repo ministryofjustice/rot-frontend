@@ -1,20 +1,15 @@
 import React from 'react';
 import Portal from 'react-portal';
 import { Link } from 'react-router-dom';
-import Griddle, {
-  RowDefinition,
-  ColumnDefinition,
-  plugins
-} from 'griddle-react';
 import _ from 'lodash';
+import Spinner from 'react-spinkit';
 
-import { enhancedWithRowData } from './Base';
 import { Input, TextArea, Select } from './elements/form-elements';
 import { Confirm } from './elements/portals';
 import { VisibleToAuthenticated } from '../containers/AuthContainers';
 
 
-const Filter = (props) => {
+const Filter = ({ setFilter }) => {
   return (
     <div className="grid-row">
     <div className="column-two-thirds">
@@ -26,7 +21,7 @@ const Filter = (props) => {
             name="query"
             className="form-control mod-search-input focus"
             placeholder="search"
-            onChange={ (e) => props.setFilter(e.target.value) }
+            onChange={ (e) => setFilter(e.target.value) }
           />
         </div>
         <input type="submit" name="commit" value="Search" className="mod-search-submit" />
@@ -38,45 +33,27 @@ const Filter = (props) => {
 }
 
 
-
-const Layout = ({ Table, Filter, Pagination, SettingsWrapper }) => (
-  <div>
-    <Filter />
-    <Pagination />
-    <Table />
-  </div>
-);
-
-
-const LinkToView = (props) => {
-  if (props.value !== null) {
-    return <Link to={ `/services/${props.rowData.id}` }>{ props.value }</Link>
-  }
-  return null;
-};
-
-
-const OwnerLink = (props) => {
-  if (props.value !== null) {
+const OwnerLink = ({ owner }) => {
+  if (owner !== null) {
     return (
-      <Link to={ `/persons/${props.value.get( 'id' ) }` }>
-        { props.value.get( 'first_name' ) } { props.value.get( 'last_name' ) }
+      <Link to={ `/persons/${owner['id'] }` }>
+        { owner['first_name'] } { owner['last_name'] }
       </Link>
     )
   }
   return null;
 };
 
-const AreaLinks = (props) => {
-  if (props.value !== null) {
+const AreaLinks = ({ areaObjects }) => {
+  if (areaObjects !== null) {
     return (
       <span>
       {
-        props.value.map((area, i) =>
-          <span key={ area.get('id') }>
+        areaObjects.map((area, i) =>
+          <span key={ area['id'] }>
             { i > 0 ? ", " : null }
-            <Link to={ `/areas/${ area.get('id') }` }>
-              { area.get( 'name' ) }
+            <Link to={ `/areas/${ area['id'] }` }>
+              { area['name'] }
             </Link>
           </span>
         )
@@ -87,16 +64,16 @@ const AreaLinks = (props) => {
 };
 
 
-const CategoryLinks = (props) => {
-  if (props.value !== null) {
+const CategoryLinks = ({ categoryObjects }) => {
+  if (categoryObjects !== null) {
     return (
       <span>
       {
-        props.value.map((category, i) =>
-          <span key={ category.get('id') }>
+        categoryObjects.map((category, i) =>
+          <span key={ category['id'] }>
             { i > 0 ? ", " : null }
-            <Link to={ `/categories/${ category.get('id') }` }>
-              { category.get( 'name' ) }
+            <Link to={ `/categories/${ category['id'] }` }>
+              { category['name'] }
             </Link>
           </span>
         )
@@ -107,50 +84,181 @@ const CategoryLinks = (props) => {
 };
 
 
-export const List = ( { services } ) => {
-  return (
-    <div>
-    <h2 className="heading-large">All Services</h2>
-    <Griddle
-      data={ services }
-      plugins={[plugins.LocalPlugin]}
-      components={ { Layout, Filter } }
-      pageProperties={ { pageSize: 20 } }
-      styleConfig={{
-        classNames: {
-          Filter: 'form-control mod-search-input'
-        }
-      }}
-    >
-      <RowDefinition>
-        <ColumnDefinition
-          id="name"
-          title="Name"
-          customComponent={ enhancedWithRowData(LinkToView) }
-        />
-        <ColumnDefinition
-          id="description"
-          title="Description"
-        />
-        <ColumnDefinition
-          id="owner"
-          title="Owner"
-          customComponent={ OwnerLink }
-        />
-        <ColumnDefinition
-          id="areaObjects"
-          title="Business Areas"
-          customComponent={ AreaLinks }
-        />
-        <ColumnDefinition
-          id="categoryObjects"
-          title="Category"
-          customComponent={ CategoryLinks }
-        />
-      </RowDefinition>
-    </Griddle>
+const ServiceCard = ({ service }) => (
+  <div className="card">
+    <div className="grid-row">
+      <div className="column-two-thirds">
+        <Link to={ `/services/${service.id}` }>
+          <p className="heading-small">
+            { service.name }
+          </p>
+        </Link>
+        <p>{ service.description }</p>
+      </div>
+      <div className="column-one-third">
+        <p className="heading-small">Owner</p>
+        <OwnerLink owner={ service.owner } />
+      </div>
+    </div>
+    <div className="grid-row">
+      <div className="column-two-thirds">
+        <p>Used by:&nbsp; <AreaLinks areaObjects={ service.areaObjects } />
+        </p>
+        <p>Category:&nbsp;
+          <CategoryLinks categoryObjects={ service.categoryObjects }/>
+        </p>
+      </div>
+      <div className="column-one-third">
+        <Link to={`/services/${service.id}`}>Is this information wrong?</Link>
+      </div>
+    </div>
   </div>
 );
+
+
+export class List extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchPhrase: '',
+      selectedAreaIds: [],
+      selectedCategoryIds: [],
+      areaIds: [],
+      categoryIds: []
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.services.length === 0) {
+      this.setState({ loading: true });
+    } else {
+      this.setState({ loading: false });
+    }
+    const areaIds = _(nextProps.services)
+      .map(it => it.areas)
+      .flatten().uniq().value();
+    const categoryIds = _(nextProps.services)
+      .map(it => it.categories)
+      .flatten().uniq().value();
+    this.setState({ areaIds, categoryIds });
+  }
+
+  render() {
+    if (this.state.loading) {
+      return (
+        <div className="spinkit">
+          <Spinner name='three-bounch'/>
+        </div>
+      );
+    }
+
+    const { services, areas, categories }= this.props;
+    let selectedServices = services;
+    if (this.state.selectedCategoryIds.length !== 0) {
+      selectedServices = selectedServices.filter(
+        service => _.intersection(service.categories, this.state.selectedCategoryIds).length > 0
+      );
+    }
+    if (this.state.selectedAreaIds.length !== 0) {
+      selectedServices = selectedServices.filter(
+        service => _.intersection(service.areas, this.state.selectedAreaIds).length > 0
+      );
+    }
+
+    if (this.state.searchPhrase !== '') {
+      selectedServices = selectedServices.filter(
+        service => JSON.stringify(service).toLowerCase()
+          .indexOf(this.state.searchPhrase.toLowerCase()) !== -1
+      );
+    }
+
+    return (
+      <div>
+        <h2 className="heading-large">Services</h2>
+        <Filter setFilter={ (value) => this.setState({ searchPhrase: value }) }/>
+        <div className="grid-row">
+          <div className="column-one-third">
+            <hr/>
+            <p>Filter by</p>
+            <p className="heading-small">Used by</p>
+            {
+              this.state.areaIds.map((areaId, i) => {
+                const area = areas.find(it => it.id === areaId);
+                return (
+                  <div key={ i }>
+                    <input type="checkbox"
+                      checked={ this.state.selectedAreaIds.indexOf(areaId) !== -1 }
+                      onChange={ (e) => {
+                        let selectedAreaIds = [...this.state.selectedAreaIds];
+                        if (e.target.checked) {
+                          if (!(areaId in selectedAreaIds)) {
+                            selectedAreaIds.push(areaId);
+                          }
+                        } else {
+                          selectedAreaIds = selectedAreaIds.filter(id => id !== areaId);
+                        }
+                        this.setState({ selectedAreaIds });
+                      } }/>
+                    <span>{ area.name }</span>
+                  </div>
+                )
+              })
+            }
+            <hr/>
+            <p className="heading-small">Category</p>
+            {
+              this.state.categoryIds.map((categoryId, i) => {
+                const category = categories.find(it => it.id === categoryId);
+                const count = services
+                  .map(it => it.categories.indexOf(categoryId) !== -1)
+                  .filter(it => it)
+                  .length;
+                return (
+                  <div key={ i }>
+                    <input type="checkbox"
+                      checked={ this.state.selectedCategoryIds.indexOf(categoryId) !== -1 }
+                      onChange={ (e) => {
+                        let selectedCategoryIds = [...this.state.selectedCategoryIds];
+                        if (e.target.checked) {
+                          if (!(categoryId in selectedCategoryIds)) {
+                            selectedCategoryIds.push(categoryId);
+                          }
+                        } else {
+                          selectedCategoryIds = selectedCategoryIds.filter(id => id !== categoryId);
+                        }
+                        this.setState({ selectedCategoryIds });
+                      } }
+                    />
+                    <span>{ `${category.name} (${count})` }</span>
+                  </div>
+                )
+              })
+            }
+            <hr/>
+          </div>
+          <div className="column-two-thirds">
+            <span>
+              <span className="heading-small">
+                { selectedServices.length }
+              </span> results found sort by &nbsp;
+              <select>
+                <option value="name">Service name</option>
+                <option value="relevance">Relevance</option>
+              </select>
+            </span>
+            {
+              selectedServices.map(service =>
+                <ServiceCard
+                  key={ service.id }
+                  service={ service } />
+              )
+            }
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 
@@ -243,9 +351,7 @@ export class CreateOrUpdate extends React.Component {
       errors,
       owner_id,
       categories,
-      areas,
-      categoryObjects,
-      areaObjects
+      areas
     } = this.state;
     if (name === '' || owner_id === '' || (areas && areas.length === 0) || (categories && categories.length === 0)) {
       return false;
@@ -306,9 +412,7 @@ export class CreateOrUpdate extends React.Component {
       name,
       errors,
       description,
-      owner_id,
-      categoryObjects,
-      areaObjects,
+      owner_id
     } = this.state;
     return (
       <div>
