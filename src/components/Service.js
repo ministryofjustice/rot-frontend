@@ -33,11 +33,11 @@ const Filter = ({ setFilter }) => {
 }
 
 
-const OwnerLink = ({ owner }) => {
-  if (owner !== null) {
+const OwnerLink = ({ ownerObject }) => {
+  if (ownerObject !== null) {
     return (
-      <Link to={ `/persons/${owner['id'] }` }>
-        { owner['first_name'] } { owner['last_name'] }
+      <Link to={ `/persons/${ownerObject['id'] }` }>
+        { ownerObject['first_name'] } { ownerObject['last_name'] }
       </Link>
     )
   }
@@ -97,7 +97,7 @@ const ServiceCard = ({ service }) => (
       </div>
       <div className="column-one-third">
         <p className="heading-small">Owner</p>
-        <OwnerLink owner={ service.owner } />
+        <OwnerLink ownerObject={ service.ownerObject } />
       </div>
     </div>
     <div className="grid-row">
@@ -262,14 +262,14 @@ export class List extends React.Component {
 }
 
 
-export const Detail = ({ id, name, description, owner, areaObjects, categoryObjects, handleDelete }) => {
+export const Detail = ({ id, name, description, ownerObject, areaObjects, categoryObjects, handleDelete }) => {
   // TODO better handling
   if (typeof id === 'undefined') {
     return null;
   }
 
-  const Owner = owner ? (
-    <Link to={ `/persons/${owner.id}` }>{ owner.name }</Link>
+  const Owner = ownerObject ? (
+    <Link to={ `/persons/${ownerObject.id}` }>{ ownerObject.name }</Link>
   ) : (
     <span></span>
   );
@@ -349,11 +349,11 @@ export class CreateOrUpdate extends React.Component {
     const {
       name,
       errors,
-      owner_id,
+      owner,
       categories,
       areas
     } = this.state;
-    if (name === '' || owner_id === '' || (areas && areas.length === 0) || (categories && categories.length === 0)) {
+    if (name === '' || owner === '' || (areas && areas.length === 0) || (categories && categories.length === 0)) {
       return false;
     }
 
@@ -366,7 +366,7 @@ export class CreateOrUpdate extends React.Component {
     const attrs = [
       'name',
       'description',
-      'owner_id',
+      'owner',
       'categories',
       'areas'
     ];
@@ -412,7 +412,7 @@ export class CreateOrUpdate extends React.Component {
       name,
       errors,
       description,
-      owner_id
+      owner
     } = this.state;
     return (
       <div>
@@ -433,11 +433,11 @@ export class CreateOrUpdate extends React.Component {
         />
         <Select
           name="owner"
-          value={ owner_id }
+          value={ owner }
           label="Owner"
-          error={ errors.owner_id }
+          error={ errors.owner }
           options={ persons.map(person => ({ value: person.id, label: person.first_name + ' ' + person.last_name })) }
-          onChange={ item => this.setState({ owner_id: item ? item.value : null }) }
+          onChange={ item => this.setState({ owner: item ? item.value : null }) }
         />
         <Select
           name="categories"

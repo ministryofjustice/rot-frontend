@@ -5,7 +5,7 @@ import { CreateOrUpdate, List, Detail } from '../components/Service';
 
 function mergeServices(state) {
   return state.service.all.map(service => {
-      let owner = state.person.all.find(item => item['id'] === service['owner_id']);
+      let owner = state.person.all.find(item => item['id'] === service['owner']);
       owner = typeof owner !== 'undefined' ? owner : {};
 
       const areas = service.areas.map(areaId => {
@@ -23,7 +23,7 @@ function mergeServices(state) {
         {
           areaObjects: areas,
           categoryObjects: categories,
-          owner
+          ownerObject: owner
         }
       );
     })
@@ -40,7 +40,7 @@ export const CreateContainer = connect(
     service: {
       name: '',
       description: '',
-      owner_id: '',
+      owner: '',
       categories: [],
       areas: [],
       catgegoryObjects: [],
@@ -64,7 +64,7 @@ export const UpdateContainer = connect(
       service = {
         name: '',
         description: '',
-        owner_id: '',
+        owner: '',
         categories: [],
         areas: [],
         catgegoryObjects: [],

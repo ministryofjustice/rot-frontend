@@ -102,7 +102,7 @@ export function* createNewService(baseURL, history) {
         id: randomString(17),
         name: service.name,
         description: service.description,
-        owner_id: service.owner_id,
+        owner: service.owner,
         areas: service.areas,
         categories: service.categories
       }),
@@ -130,7 +130,7 @@ export function* updateService(baseURL, history) {
       body: JSON.stringify({
         name: service.name,
         description: service.description,
-        owner_id: service.owner_id,
+        owner: service.owner,
         areas: service.areas,
         categories: service.categories
       }),
