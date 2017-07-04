@@ -436,7 +436,7 @@ export class CreateOrUpdate extends React.Component {
           value={ owner_id }
           label="Owner"
           error={ errors.owner_id }
-          options={ persons.map(person => ({ value: person.id, label: person.name })) }
+          options={ persons.map(person => ({ value: person.id, label: person.first_name + ' ' + person.last_name })) }
           onChange={ item => this.setState({ owner_id: item ? item.value : null }) }
         />
         <Select
