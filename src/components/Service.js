@@ -7,6 +7,7 @@ import Spinner from 'react-spinkit';
 import { Input, TextArea, Select } from './elements/form-elements';
 import { Confirm } from './elements/portals';
 import { VisibleToAuthenticated } from '../containers/AuthContainers';
+import { Pagination } from '../components/Pagination';
 
 
 const Filter = ({ setFilter }) => {
@@ -255,6 +256,9 @@ export class List extends React.Component {
               )
             }
           </div>
+        </div>
+        <div>
+          <Pagination prev="" next="" count="10" />
         </div>
       </div>
     );
