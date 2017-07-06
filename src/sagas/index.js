@@ -18,32 +18,23 @@ export function* callAPIEndpointData(baseURL, pathName, eventType) {
   // TODO - handle pagination
   const rsp = yield callAPI(`${baseURL}/${pathName}`);
   const respJson = yield rsp.json();
-  const data = respJson.results;
+  const items = respJson.results;
+  const pagination = {
+    previous: respJson.previous,
+    next: respJson.next,
+    count: respJson.count
+  };
 
-  yield put({ type: eventType, data });
-}
-
-
-export function* callAPIEndpointDataRecur(baseURL, pathName, eventType, items = []) {
-  const rsp = yield callAPI(`${baseURL}/${pathName}`);
-  const respJson = yield rsp.json();
-  const results = respJson.results;
-  items = [...items, ...results];
-  const next = respJson['next'];
-  if (next === null) {
-    yield put({ type: eventType, data: items });
-  } else {
-    return yield callAPIEndpointDataRecur(baseURL, next.slice(baseURL.length + 1), eventType, items);
-  }
+  yield put({ type: eventType, data: items });
 }
 
 
 export function* callAPIData(baseURL) {
   // TODO - we do not need to be getting all this data all the time
-  yield callAPIEndpointDataRecur(baseURL, 'people', 'FETCH_PERSON_DATA_SUCCEEDED');
-  yield callAPIEndpointDataRecur(baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
-  yield callAPIEndpointDataRecur(baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
-  yield callAPIEndpointDataRecur(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'people', 'FETCH_PERSON_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED');
 }
 
 
