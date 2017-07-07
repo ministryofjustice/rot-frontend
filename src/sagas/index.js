@@ -15,7 +15,6 @@ export function* callAPI(input, init={}) {
 
 
 export function* callAPIEndpointData(baseURL, pathName, eventType) {
-  // TODO - handle pagination
   const rsp = yield callAPI(`${baseURL}/${pathName}`);
   const respJson = yield rsp.json();
   const items = respJson.results;
@@ -25,7 +24,7 @@ export function* callAPIEndpointData(baseURL, pathName, eventType) {
     count: respJson.count
   };
 
-  yield put({ type: eventType, data: items });
+  yield put({ type: eventType, data: items, pagination: pagination });
 }
 
 

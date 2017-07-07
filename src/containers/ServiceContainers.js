@@ -111,6 +111,7 @@ export const ListContainer = connect(
   state => ({
     services: mergeServices(state),
     areas: state.area.all,
-    categories: state.category.all
+    categories: state.category.all,
+    pagination: state.service.pagination
   })
 )(List);

@@ -173,7 +173,6 @@ export class List extends React.Component {
           .indexOf(this.state.searchPhrase.toLowerCase()) !== -1
       );
     }
-
     return (
       <div>
         <h2 className="heading-large">Services</h2>
@@ -258,7 +257,10 @@ export class List extends React.Component {
           </div>
         </div>
         <div>
-          <Pagination prev="" next="" count="10" />
+          <Pagination
+            previous={ this.props.pagination.previous }
+            next={ this.props.pagination.next }
+            count={ this.props.pagination.count } />
         </div>
       </div>
     );
