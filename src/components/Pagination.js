@@ -4,9 +4,7 @@ import { Link, Button } from 'react-router-dom';
 
 export const PaginationLink = ({to, label}) => {
     return (
-      <button>
-        <Link to={ to }>{label}</Link>
-      </button>
+      <Link to={ to }>{label}</Link>
     )
   }
 ;
@@ -18,8 +16,8 @@ export const Pagination = ({ prev, next, count, per = 20}) => {
   const totalPages = Math.ceil(count/per);
   const url = '/services';
   return (
-    <nav className="paginationBar">
-      <button className="previous">Previous</button>
+    <nav className="pagination">
+      <Link to="" className="previous">&lt;</Link>
       {
         [...new Array(totalPages)].map((x, i) =>
           <PaginationLink
@@ -28,7 +26,7 @@ export const Pagination = ({ prev, next, count, per = 20}) => {
             label={ i+1 }/>
         )
       }
-      <button className="next">Next</button>
+      <Link to="" className="next">&gt;</Link>
     </nav>
   )
 };
