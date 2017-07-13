@@ -20,9 +20,8 @@ function getPage(uri) {
     if (params.page) {
       return params.page;
     }
-    return "1";
   }
-  return null;
+  return "1";
 }
 
 
@@ -66,13 +65,12 @@ export const Pagination = ({ previous, next, count, onChangePage, per = 20}) => 
           page={prevPage}
           total={totalPages}
           type="previous"
-          handleClick={onChangePage}/>
+          handleClick={onChangePage} />
         <ChangePage
           page={nextPage}
           total={totalPages}
           type="next"
-          handleClick={onChangePage}
-          />
+          handleClick={onChangePage} />
       </ul>
     </nav>
   )
