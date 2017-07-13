@@ -78,3 +78,6 @@ https://github.com/alphagov/static/blob/da8aeeaa749093eab30286d7fc9f965533b66f47
         width: 100%; }
       .govuk-previous-and-next-navigation li.next-page a {
         text-align: right; } }
+
+.govuk-previous-and-next-navigation {
+  margin-top: 40px; }

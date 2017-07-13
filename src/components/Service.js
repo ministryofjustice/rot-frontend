@@ -254,14 +254,14 @@ export class List extends React.Component {
                   service={ service } />
               )
             }
+            <div>
+              <Pagination
+                previous={ this.props.pagination.previous }
+                next={ this.props.pagination.next }
+                count={ this.props.pagination.count }
+                onChangePage={this.props.handleChangePage}/>
+            </div>
           </div>
-        </div>
-        <div>
-          <Pagination
-            previous={ this.props.pagination.previous }
-            next={ this.props.pagination.next }
-            count={ this.props.pagination.count }
-            onChangePage={this.props.handleChangePage}/>
         </div>
       </div>
     );
