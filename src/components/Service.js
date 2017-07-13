@@ -240,7 +240,7 @@ export class List extends React.Component {
           <div className="column-two-thirds">
             <span>
               <span className="heading-small">
-                { selectedServices.length }
+                { this.props.pagination.count }
               </span> results found sort by &nbsp;
               <select>
                 <option value="name">Service name</option>
