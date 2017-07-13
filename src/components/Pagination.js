@@ -1,41 +1,78 @@
 import React from 'react';
-import { Link, Button } from 'react-router-dom';
+import queryString from 'query-string'
 
 import '../styles/Pagination.css';
 
 
-export const PaginationLink = ({to, label}) => {
-    return (
-      <Link to={ to }>{label}</Link>
-    )
+function capitalize(str) {
+  if (str.length) {
+    return str[0].toUpperCase() + str.slice(1).toLowerCase();
+  } else {
+    return '';
   }
-;
+}
 
 
-export const Pagination = ({ prev, next, count, per = 20}) => {
+function getPage(uri) {
+  const url = new URL(uri);
+  if (url.search) {
+    const params = queryString.parse(url.search);
+    if (params.page) {
+      return params.page;
+    }
+    return "1";
+  }
+  return null;
+}
+
+
+class ChangePage extends React.Component {
+  render() {
+    if (this.props.page) {
+      return (
+        <li onClick={() => this.props.handleClick(this.props.page)} className={this.props.type + "-page"}>
+          <a rel={this.props.type + "-page"} >
+            <span className="pagination-part-title">{capitalize(this.props.type)} page</span>
+            <span className="pagination-label">{this.props.page} of {this.props.total}</span>
+          </a>
+        </li>
+      );
+    } else {
+      return null;
+    }
+  }
+}
+
+
+export const Pagination = ({ previous, next, count, onChangePage, per = 20}) => {
   count = Number.parseInt(count);
   per =  Number.parseInt(per);
   const totalPages = Math.ceil(count/per);
-  const url = '/services';
+
+  let prevPage = null;
+  if (previous) {
+    prevPage = getPage(previous);
+  }
+
+  let nextPage = null;
+  if (next) {
+    nextPage = getPage(next);
+  }
+
   return (
     <nav className="govuk-previous-and-next-navigation" role="navigation" aria-label="Pagination">
       <ul className="group">
-
-          <li className="previous-page">
-            <a href="#" rel="previous" >
-              <span className="pagination-part-title">Previous page</span>
-              <span className="pagination-label">1 of {totalPages}</span>
-            </a>
-          </li>
-
-
-          <li className="next-page">
-            <a href="#" rel="next">
-              <span className="pagination-part-title">Next page</span>
-              <span className="pagination-label">3 of {totalPages}</span>
-            </a>
-          </li>
-
+        <ChangePage
+          page={prevPage}
+          total={totalPages}
+          type="previous"
+          handleClick={onChangePage}/>
+        <ChangePage
+          page={nextPage}
+          total={totalPages}
+          type="next"
+          handleClick={onChangePage}
+          />
       </ul>
     </nav>
   )

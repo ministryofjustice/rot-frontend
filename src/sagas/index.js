@@ -14,8 +14,10 @@ export function* callAPI(input, init={}) {
 }
 
 
-export function* callAPIEndpointData(baseURL, pathName, eventType) {
-  const rsp = yield callAPI(`${baseURL}/${pathName}`);
+export function* callAPIEndpointData(baseURL, pathName, eventType, params={}) {
+  const url = new URL(`${baseURL}/${pathName}`);
+  Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+  const rsp = yield callAPI(url);
   const respJson = yield rsp.json();
   const items = respJson.results;
   const pagination = {
@@ -34,6 +36,14 @@ export function* callAPIData(baseURL) {
   yield callAPIEndpointData(baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
   yield callAPIEndpointData(baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
   yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED');
+}
+
+
+export function* getServicePage(baseURL, history) {
+  while(true) {
+    const { page } = yield take('SERVICE_CHANGE_PAGE');
+    yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED', { page: page });
+  }
 }
 
 
@@ -306,6 +316,7 @@ export default function* root(baseURL, history, clientId, oAuthURL, appBaseURL) 
   yield fork(createNewArea, baseURL, history);
   yield fork(deleteArea, baseURL, history);
   yield fork(createNewService, baseURL, history);
+  yield fork(getServicePage, baseURL, history);
   yield fork(updateService, baseURL, history);
   yield fork(deleteService, baseURL, history);
   yield fork(createNewPerson, baseURL, history);

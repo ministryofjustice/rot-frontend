@@ -113,5 +113,11 @@ export const ListContainer = connect(
     areas: state.area.all,
     categories: state.category.all,
     pagination: state.service.pagination
+  }),
+  dispatch => ({
+    handleChangePage: (page) => dispatch({
+      type: 'SERVICE_CHANGE_PAGE',
+      page
+    }),
   })
 )(List);

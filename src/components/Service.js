@@ -260,7 +260,8 @@ export class List extends React.Component {
           <Pagination
             previous={ this.props.pagination.previous }
             next={ this.props.pagination.next }
-            count={ this.props.pagination.count } />
+            count={ this.props.pagination.count }
+            onChangePage={this.props.handleChangePage}/>
         </div>
       </div>
     );
