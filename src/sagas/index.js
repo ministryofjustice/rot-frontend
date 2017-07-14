@@ -41,7 +41,8 @@ export function* callAPIData(baseURL, history) {
     const params = queryString.parse(history.location.search);
     if (params.search) {
       queryParams.search = params.search;
-    } else if (params.page) {
+    }
+    if (params.page) {
       queryParams.page = params.page;
     }
   }
@@ -52,9 +53,14 @@ export function* callAPIData(baseURL, history) {
 
 export function* getServicePage(baseURL, history) {
   while(true) {
-    const { page } = yield take('SERVICE_CHANGE_PAGE');
-    yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED', { page: page });
-    history.push(`/services?page=${page}`);
+    const { queryParams } = yield take('SERVICE_CHANGE_PAGE');
+    let params = {};
+    if (history.location.search) {
+      params = queryString.parse(history.location.search);
+    }
+    params = Object.assign({}, params, queryParams);
+    yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED', params);
+    history.push(`${history.location.pathname}?${queryString.stringify(params)}`);
   }
 }
 

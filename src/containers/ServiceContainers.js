@@ -115,9 +115,9 @@ export const ListContainer = connect(
     pagination: state.service.pagination
   }),
   dispatch => ({
-    handleChangePage: (page) => dispatch({
+    handleChangePage: (queryParams) => dispatch({
       type: 'SERVICE_CHANGE_PAGE',
-      page
+      queryParams
     }),
   })
 )(List);

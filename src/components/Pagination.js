@@ -29,7 +29,9 @@ class ChangePage extends React.Component {
   render() {
     if (this.props.page) {
       return (
-        <li onClick={() => this.props.handleClick(this.props.page)} className={this.props.type + "-page"}>
+        <li
+          onClick={() => this.props.handleClick({page: this.props.page})}
+          className={this.props.type + "-page"}>
           <a rel={this.props.type + "-page"} >
             <span className="pagination-part-title">{capitalize(this.props.type)} page</span>
             <span className="pagination-label">{this.props.page} of {this.props.total}</span>
