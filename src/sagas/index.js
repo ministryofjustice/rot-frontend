@@ -54,6 +54,7 @@ export function* getServicePage(baseURL, history) {
   while(true) {
     const { page } = yield take('SERVICE_CHANGE_PAGE');
     yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED', { page: page });
+    history.push(`/services?page=${page}`);
   }
 }
 
