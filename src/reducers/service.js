@@ -1,12 +1,17 @@
 const cleanState = {
-  all: []
+  all: [],
+  pagination: {
+    next: '',
+    previous: '',
+    count: 0
+  }
 };
 
 const processData = (state, action) => {
   // todo - need to change name of 'all' later
   const all = action.data
     .sort((a, b) => a.name > b.name ? 1 : -1);
-  return Object.assign({}, state, { all });
+  return Object.assign({}, state, { all, pagination: action.pagination });
 };
 
 const service = (state = cleanState, action) => {

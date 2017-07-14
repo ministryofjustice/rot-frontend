@@ -14,36 +14,54 @@ export function* callAPI(input, init={}) {
 }
 
 
-export function* callAPIEndpointData(baseURL, pathName, eventType) {
-  // TODO - handle pagination
-  const rsp = yield callAPI(`${baseURL}/${pathName}`);
+export function* callAPIEndpointData(baseURL, pathName, eventType, params={}) {
+  const url = new URL(`${baseURL}/${pathName}`);
+  Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+  const rsp = yield callAPI(url);
   const respJson = yield rsp.json();
-  const data = respJson.results;
+  const items = respJson.results;
+  const pagination = {
+    previous: respJson.previous,
+    next: respJson.next,
+    count: respJson.count
+  };
 
-  yield put({ type: eventType, data });
+  yield put({ type: eventType, data: items, pagination: pagination });
 }
 
 
-export function* callAPIEndpointDataRecur(baseURL, pathName, eventType, items = []) {
-  const rsp = yield callAPI(`${baseURL}/${pathName}`);
-  const respJson = yield rsp.json();
-  const results = respJson.results;
-  items = [...items, ...results];
-  const next = respJson['next'];
-  if (next === null) {
-    yield put({ type: eventType, data: items });
-  } else {
-    return yield callAPIEndpointDataRecur(baseURL, next.slice(baseURL.length + 1), eventType, items);
-  }
-}
-
-
-export function* callAPIData(baseURL) {
+export function* callAPIData(baseURL, history) {
   // TODO - we do not need to be getting all this data all the time
-  yield callAPIEndpointDataRecur(baseURL, 'people', 'FETCH_PERSON_DATA_SUCCEEDED');
-  yield callAPIEndpointDataRecur(baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
-  yield callAPIEndpointDataRecur(baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
-  yield callAPIEndpointDataRecur(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'people', 'FETCH_PERSON_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
+  yield callAPIEndpointData(baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
+
+  const queryParams = {};
+  if (history.location.search) {
+    const params = queryString.parse(history.location.search);
+    if (params.search) {
+      queryParams.search = params.search;
+    }
+    if (params.page) {
+      queryParams.page = params.page;
+    }
+  }
+
+  yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED', queryParams);
+}
+
+
+export function* getServicePage(baseURL, history) {
+  while(true) {
+    const { queryParams } = yield take('SERVICE_CHANGE_PAGE');
+    let params = {};
+    if (history.location.search) {
+      params = queryString.parse(history.location.search);
+    }
+    params = Object.assign({}, params, queryParams);
+    yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED', params);
+    history.push(`${history.location.pathname}?${queryString.stringify(params)}`);
+  }
 }
 
 
@@ -102,7 +120,7 @@ export function* createNewService(baseURL, history) {
         id: randomString(17),
         name: service.name,
         description: service.description,
-        owner_id: service.owner_id,
+        owner: service.owner,
         areas: service.areas,
         categories: service.categories
       }),
@@ -130,7 +148,7 @@ export function* updateService(baseURL, history) {
       body: JSON.stringify({
         name: service.name,
         description: service.description,
-        owner_id: service.owner_id,
+        owner: service.owner,
         areas: service.areas,
         categories: service.categories
       }),
@@ -312,10 +330,11 @@ export function* logout(baseURL, history, clientId, oAuthURL) {
 
 
 export default function* root(baseURL, history, clientId, oAuthURL, appBaseURL) {
-  yield fork(callAPIData, baseURL);
+  yield fork(callAPIData, baseURL, history);
   yield fork(createNewArea, baseURL, history);
   yield fork(deleteArea, baseURL, history);
   yield fork(createNewService, baseURL, history);
+  yield fork(getServicePage, baseURL, history);
   yield fork(updateService, baseURL, history);
   yield fork(deleteService, baseURL, history);
   yield fork(createNewPerson, baseURL, history);
