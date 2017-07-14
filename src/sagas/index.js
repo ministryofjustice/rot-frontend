@@ -30,12 +30,23 @@ export function* callAPIEndpointData(baseURL, pathName, eventType, params={}) {
 }
 
 
-export function* callAPIData(baseURL) {
+export function* callAPIData(baseURL, history) {
   // TODO - we do not need to be getting all this data all the time
   yield callAPIEndpointData(baseURL, 'people', 'FETCH_PERSON_DATA_SUCCEEDED');
   yield callAPIEndpointData(baseURL, 'categories', 'FETCH_CATEGORY_DATA_SUCCEEDED');
   yield callAPIEndpointData(baseURL, 'areas', 'FETCH_AREA_DATA_SUCCEEDED');
-  yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED');
+
+  const queryParams = {};
+  if (history.location.search) {
+    const params = queryString.parse(history.location.search);
+    if (params.search) {
+      queryParams.search = params.search;
+    } else if (params.page) {
+      queryParams.page = params.page;
+    }
+  }
+
+  yield callAPIEndpointData(baseURL, 'items', 'FETCH_SERVICE_DATA_SUCCEEDED', queryParams);
 }
 
 
@@ -312,7 +323,7 @@ export function* logout(baseURL, history, clientId, oAuthURL) {
 
 
 export default function* root(baseURL, history, clientId, oAuthURL, appBaseURL) {
-  yield fork(callAPIData, baseURL);
+  yield fork(callAPIData, baseURL, history);
   yield fork(createNewArea, baseURL, history);
   yield fork(deleteArea, baseURL, history);
   yield fork(createNewService, baseURL, history);
